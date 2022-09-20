@@ -30,7 +30,8 @@ public class UpdateModFile {
 			FileWriter myWriter = new FileWriter(directory + fileName);
 			myWriter.write(output);
 			myWriter.close();
-			System.out.println(output);
+			//System.out.println(output);
+			
 			
 		} catch (IOException e) {
 			System.out.println("An error occurred.");
@@ -40,14 +41,20 @@ public class UpdateModFile {
 	
 	public String buildString(List<ModInfo> modList){
 		String output = new String();
+		String bool;
 		output = "AddonList \n" + "{ \n";
 		for(int i=0; i < modList.size(); i++) {
+			bool = "0";
+			if(modList.get(i).getEnabled() == true) {
+				bool = "1";
+			}
 			output += "\"workshop\\" 
 			+ modList.get(i).getCode() 
 			+ ".vpk\"\t\"" 
-			+ modList.get(i).getEnabled() 
+			+ bool 
 			+ "\"\n";
 		}
+		output += "}";
 		return output;
 	}
 	

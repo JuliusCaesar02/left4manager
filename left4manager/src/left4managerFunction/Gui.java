@@ -3,6 +3,7 @@ package left4managerFunction;
 import java.awt.EventQueue;
 import java.util.List;
 import java.util.Vector;
+import java.awt.event.*;  
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.table.*;
@@ -52,13 +53,9 @@ public class Gui {
 		debug();
 	}
 	
-	private void debug() {
-		extractModList.populateModList();
-		List<ModInfo> modList = extractModList.getModList();
-		
+	private void debug() {		
 		updateModFile.setFileName("addonlist2.txt");
 		updateModFile.setDirectory("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2\\");
-		updateModFile.writeFile(updateModFile.buildString(modList));
 	}
 
 	private void initialize() {		
@@ -102,6 +99,20 @@ public class Gui {
 		model.addColumn("author");
 		model.addColumn("enabled");
 		table = new JTable(model);
+		
+		JPanel rightPanel = new JPanel(new BorderLayout());
+		
+		//Save file button
+		JButton saveButton = new JButton("Save");  
+		saveButton.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				updateModFile.writeFile(updateModFile.buildString(extractModList.getModList()));
+	        }  
+	    });  
+		
+		rightPanel.add(saveButton);  
+		
+		frame.add(rightPanel);
 		JScrollPane scrollPane = new JScrollPane(table); 
 		frame.getContentPane().add(scrollPane, BorderLayout.WEST);
 		addTableListener();
@@ -114,10 +125,8 @@ public class Gui {
 			@Override
 			public void tableChanged(TableModelEvent tme) {
 				if (tme.getType() == TableModelEvent.UPDATE) {
-					extractModList.populateModList();
-					List<ModInfo> modList = extractModList.getModList();
 					boolean newValue = (Boolean) model.getValueAt(tme.getFirstRow(),tme.getColumn());
-					modList.get(tme.getFirstRow()).setEnabled(newValue);
+					extractModList.getModList().get(tme.getFirstRow()).setEnabled(newValue);
 					
 					
 					/*System.out.println("Cell " + tme.getFirstRow() + ", "
@@ -126,8 +135,6 @@ public class Gui {
 									tme.getColumn()));
 					System.out.println(modList.get(tme.getFirstRow()).getCode() + 
 							modList.get(tme.getFirstRow()).getEnabled());*/
-					
-					updateModFile.writeFile(updateModFile.buildString(modList)); //TODO: Spostarlo ad un bottone "save"
 				}
 			}
 		});
@@ -138,7 +145,6 @@ public class Gui {
         extractModList.populateModList();
 		List<ModInfo> modList = extractModList.getModList();
 		for(int i=0; i<modList.size(); i++) {
-			//model.addRow(modList.get(i).getVector());
 			model.addRow(modList.get(i).getObject());
 		}
 	}
