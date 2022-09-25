@@ -1,23 +1,23 @@
 package left4managerFunction;
 
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Vector;
-import java.awt.event.*;  
-import javax.swing.JFrame;
-import javax.swing.JTable;
+import java.awt.event.*;
+
 import javax.swing.table.*;
-import javax.swing.JScrollPane;  
-import javax.swing.table.AbstractTableModel;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.*;
 
 public class Gui {
@@ -48,8 +48,8 @@ public class Gui {
 	 * Create the application.
 	 */
 	public Gui() {
+		extractModList.populateModList();
 		initialize();
-		populateTable();
 		debug();
 	}
 	
@@ -57,12 +57,86 @@ public class Gui {
 		updateModFile.setFileName("addonlist2.txt");
 		updateModFile.setDirectory("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2\\");
 	}
+	
+	//https://www.javatpoint.com/java-jtabbedpane  
+	public JTabbedPane createTabbedPane() {
+	    JPanel tab2 = new JPanel();  
+	    JPanel tab3 = new JPanel();  
+	    JPanel tab4 = new JPanel();
+	    JTabbedPane tabbedPane = new JTabbedPane();  
+	    tabbedPane.setBounds(50,50,200,200);  
+	    tabbedPane.add("List", createListTab());  
+	    tabbedPane.add("Group", tab2);  
+	    tabbedPane.add("Order", tab3);
+	    tabbedPane.add("Options", tab4);
+		return tabbedPane;
+	}
+	
+	public JPanel createListTab() {
+		JPanel listPane = new JPanel(); 
+		listPane.setBackground(Color.cyan);
+		listPane.setLayout(new GridBagLayout());
+		JCheckBox enableAll = new JCheckBox("Enable all");  
+		enableAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		enableAll.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				if(enableAll.isSelected()) enableAll(true);
+				else enableAll(false);
+				
+			}  
+		});  
+		
+		
+		JPanel leftPane = new JPanel(); 
+		leftPane.setBackground(Color.green);
+		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
+		leftPane.add(enableAll);
+		leftPane.add(createTable());
+		
+		
+		JPanel rightPane = new JPanel(); 
+		rightPane.setBackground(Color.red);
+		
+		JButton saveButton = new JButton("Save");  
+		saveButton.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				updateModFile.writeFile(updateModFile.buildString(extractModList.getModList()));
+	        }  
+	    });  
+		rightPane.add(saveButton);
+		
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.FIRST_LINE_START;
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 0;
+		c.weightx = 0.4;
+		c.weighty = 1;
+		listPane.add(leftPane, c);
+		
+		c.gridx = 1;
+		c.weightx = 0.6;
+		listPane.add(rightPane, c);
+		return listPane;
+	}
 
+	public JScrollPane createTable() {
+		
+		JTable table = new JTable(createTableModel());
+		JScrollPane scrollPane = new JScrollPane(table); 
+		
+		
+		return scrollPane;
+	}
+	
 	private void initialize() {		
 		frame = new JFrame();
 		frame.setBounds(200, 200, 850, 600);
+		frame.add(createTabbedPane());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+	}
+	
+	private DefaultTableModel createTableModel() {
 		DefaultTableModel model = new DefaultTableModel() {
 			private static final long serialVersionUID = 1L;
 
@@ -93,60 +167,34 @@ public class Gui {
 				}
 	         }
 		}; 
-	
 		model.addColumn("name");
 		model.addColumn("code");
 		model.addColumn("author");
 		model.addColumn("enabled");
-		table = new JTable(model);
 		
-		JPanel rightPanel = new JPanel(new BorderLayout());
-		
-		//Save file button
-		JButton saveButton = new JButton("Save");  
-		saveButton.addActionListener(new ActionListener(){  
-			public void actionPerformed(ActionEvent e){  
-				updateModFile.writeFile(updateModFile.buildString(extractModList.getModList()));
-	        }  
-	    });  
-		
-		rightPanel.add(saveButton);  
-		
-		frame.add(rightPanel);
-		JScrollPane scrollPane = new JScrollPane(table); 
-		frame.getContentPane().add(scrollPane, BorderLayout.WEST);
-		addTableListener();
-	}
-
-	private void addTableListener() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-		model.addTableModelListener(new TableModelListener() {
-			
+		model.addTableModelListener(new TableModelListener() {	
 			@Override
 			public void tableChanged(TableModelEvent tme) {
 				if (tme.getType() == TableModelEvent.UPDATE) {
 					boolean newValue = (Boolean) model.getValueAt(tme.getFirstRow(),tme.getColumn());
 					extractModList.getModList().get(tme.getFirstRow()).setEnabled(newValue);
-					
-					
-					/*System.out.println("Cell " + tme.getFirstRow() + ", "
-							+ tme.getColumn() + " changed. The new value: "
-							+ model.getValueAt(tme.getFirstRow(),
-									tme.getColumn()));
-					System.out.println(modList.get(tme.getFirstRow()).getCode() + 
-							modList.get(tme.getFirstRow()).getEnabled());*/
 				}
 			}
 		});
-	}
-	
-	private void populateTable() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        extractModList.populateModList();
+		
 		List<ModInfo> modList = extractModList.getModList();
 		for(int i=0; i<modList.size(); i++) {
 			model.addRow(modList.get(i).getObject());
 		}
+		
+		return model;
 	}
-
+	
+	private void enableAll(boolean value) {
+		DefaultTableModel model = createTableModel();
+		for(int i = 0; i < model.getRowCount(); i++) {
+			model.setValueAt(Boolean.valueOf(value), i, 3);
+		}
+		System.out.print(model.getValueAt(0,2)); 
+	}
 }
