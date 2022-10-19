@@ -3,28 +3,38 @@ package left4managerFunction;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 public class Config {
 	private String l4d2Dir = new String();
 	private String l4managerDir = new String();
+	final private String addonsFileName = new String("addonlist2.txt");
+
+	/************
+	 * 
+	 * @param l4d2Dir
+	 * @param l4managerDir
+	 */
+	public Config(String l4d2Dir, String l4managerDir) {
+		this.l4d2Dir = l4d2Dir;
+		this.l4managerDir = l4managerDir;
+	}
 	
+	public Config() {
+	}
 	public void setL4D2Dir(String dir) {
 		this.l4d2Dir = dir;
 	}
-	
 	public void setL4ManagerDir(String dir) {
 		this.l4managerDir = dir;
 	}
-	
 	public String getL4D2Dir() {
 		return this.l4d2Dir;
 	}
-	
 	public String getL4managerDir() {
 		return this.l4managerDir;
+	}
+	public String getAddonsFileName() {
+		return this.addonsFileName;
 	}
 	
 	public void createFile() {

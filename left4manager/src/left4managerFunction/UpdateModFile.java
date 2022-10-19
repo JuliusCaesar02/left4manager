@@ -6,13 +6,26 @@ import java.io.FileWriter;
 import java.util.List;
 
 public class UpdateModFile {
-	private String directory = new String();
+	private String addonsPath = new String();
 	private String fileName = new String();
+	
+	/********
+	 * 
+	 * @param config
+	 */
+	public UpdateModFile(Config config) {
+		this.addonsPath = config.getL4D2Dir() +File.separator +"left4dead2" +File.separator;
+		this.fileName = config.getAddonsFileName();
+	}
+	
+	public String getFileName() {
+		return this.fileName;
+	}
 	
 	public void createFile() {
 		try {
-			System.out.println(directory + fileName);
-		    File myObj = new File(directory + fileName);
+			System.out.println(addonsPath + fileName);
+		    File myObj = new File(addonsPath + fileName);
 		    if (myObj.createNewFile()) {
 		      System.out.println("File created: " + myObj.getName());
 		    } else {
@@ -27,7 +40,7 @@ public class UpdateModFile {
 	public void writeFile(String output) {
 		createFile();
 		try {
-			FileWriter myWriter = new FileWriter(directory + fileName);
+			FileWriter myWriter = new FileWriter(addonsPath + fileName);
 			myWriter.write(output);
 			myWriter.close();
 			//System.out.println(output);
@@ -56,18 +69,5 @@ public class UpdateModFile {
 		}
 		output += "}";
 		return output;
-	}
-	
-	public void setDirectory(String directory) {
-		this.directory = directory;
-	}
-	public String getDirectory() {
-		return this.directory;
-	}
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-	public String getFileName() {
-		return this.fileName;
 	}
 }

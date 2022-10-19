@@ -1,11 +1,13 @@
 package left4managerFunction;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Vector;
 import java.awt.event.*;
+import java.io.File;
 
 import javax.swing.table.*;
 
@@ -24,8 +26,9 @@ public class Gui {
 
 	private JFrame frame;
 	private JTable table;
-	ExtractModList extractModList = new ExtractModList();
-	UpdateModFile updateModFile = new UpdateModFile();
+	Config config = new Config("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\", System.getProperty("user.home") +File.separator +".left4manager");
+	ExtractModList extractModList = new ExtractModList(config);
+	UpdateModFile updateModFile = new UpdateModFile(config);
 
 
 	/**
@@ -50,12 +53,23 @@ public class Gui {
 	public Gui() {
 		extractModList.populateModList();
 		initialize();
-		debug();
+		debug();	
 	}
 	
 	private void debug() {		
-		updateModFile.setFileName("addonlist2.txt");
-		updateModFile.setDirectory("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2\\");
+		//updateModFile.setFileName("addonlist2.txt");
+		//updateModFile.setDirectory(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator);
+		//ModGroup group1 = new ModGroup("gruppo1", extractModList);
+		//System.out.println();
+		//System.out.print(group1.getGroupName());
+		//group1.addModToList(0);
+		//System.out.print(group1.getGroupMod(0).getEnabled());
+		//extractModList.getModList().get(0).setEnabled(true);;
+		//System.out.print(group1.getGroupMod(0).getEnabled());
+		//group1.getGroupMod(0).setEnabled(false);
+		//System.out.print(extractModList.getModList().get(0).getEnabled());
+		//System.out.print(group1.getGroupMod(0).getEnabled());
+		//extractModList.getModList().get(0).setEnabled(true);
 	}
 	
 	//https://www.javatpoint.com/java-jtabbedpane  
@@ -123,6 +137,7 @@ public class Gui {
 	public JScrollPane createTable() {
 		
 		JTable table = new JTable(createTableModel());
+		table.setFont(new Font("Arial MS Unicode", Font.PLAIN, 12));
 		JScrollPane scrollPane = new JScrollPane(table); 
 		
 		
