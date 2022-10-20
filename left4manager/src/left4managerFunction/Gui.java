@@ -51,12 +51,18 @@ public class Gui {
 	 * Create the application.
 	 */
 	public Gui() {
-		extractModList.populateModList();
+		try {
+			extractModList.populateModList();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		initialize();
 		debug();	
 	}
 	
 	private void debug() {		
+		//extractModList.addObjectToJsonDebug(extractModList.getModList().get(0));
 		//updateModFile.setFileName("addonlist2.txt");
 		//updateModFile.setDirectory(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator);
 		//ModGroup group1 = new ModGroup("gruppo1", extractModList);

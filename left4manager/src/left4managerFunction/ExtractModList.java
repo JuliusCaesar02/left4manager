@@ -1,7 +1,12 @@
 package left4managerFunction;
 
 import java.util.*;
+import java.lang.reflect.Type;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -9,22 +14,30 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 //String bash = "extractVPK.sh";
 //Process process = Runtime.getRuntime().exec("ciao");
 public class ExtractModList {
 	private List<ModInfo> modList = new ArrayList<ModInfo>();
 	private String addonsPath = new String();
+	private String jsonFile = new String();
 	private String fileName = new String();
     
 	public ExtractModList(Config config) {
 		this.addonsPath = config.getL4D2Dir() +File.separator +"left4dead2" +File.separator;
+		this.jsonFile = config.getL4managerDir() +File.separator +"modJson.json";
 		this.fileName = config.getAddonsFileName();
 	}
     public List<ModInfo> getModList() {
     	return this.modList;
     }
     
-    public void populateModList() {
+    /*public void populateModList() throws Exception {
+    	createJsonFile();
+    	
     	try {
     		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
 			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName));
@@ -38,11 +51,97 @@ public class ExtractModList {
 			         }
 			         String[] additionalInfo = getAdditionalInfo(checkedLine.group(1));
 			         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+			         
+			         if(checkIfEmpty()) {
+			        	 try {
+			        		 addObjectToJson(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+			        	 } catch (Exception e) {
+			        		 // TODO Auto-generated catch block
+			        		 e.printStackTrace();
+			        	 }
+			         } else {
+						 try {
+							 addObjectToJson(modList);
+						 } catch (Exception e) {
+							 // TODO Auto-generated catch block
+							 e.printStackTrace();
+						 }
+			         }
 			    }
 			});
 		} catch (IOException e) {
 			File file = new File(addonsPath +fileName);
 		}
+    }*/
+    
+    public void populateModList() {
+    	createJsonFile();
+    	
+    	try {
+    		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
+			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName));
+			System.out.println(checkIfEmpty());
+	    	if(!checkIfEmpty()) {
+	    		content.forEach(i->{
+	    			System.out.println(i);
+	    			Matcher checkedLine = pattern.matcher(i);
+	    			if (checkedLine.find()) {
+	    				boolean enabled = false;
+				         if(checkedLine.group(2).equals("1")) {
+				        	 enabled = true;
+				         }
+				         
+				         ModInfo objectFromJson = new ModInfo("NULL", false);
+						 try {
+							 objectFromJson = getObjectFromJson(checkedLine.group(1));
+						 } catch (Exception e) {
+							 // TODO Auto-generated catch block
+							 e.printStackTrace();
+						 }
+				         if(objectFromJson.getCode() == "NULL") {
+				        	 System.out.println("Object not found in json");
+				        	 String[] additionalInfo = getAdditionalInfo(checkedLine.group(1));
+					         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+					         try {
+								addObjectToJson(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+				         }
+				         else {
+				        	 System.out.println("Object found in json");
+				        	 modList.add(objectFromJson);
+				        	 modList.get(modList.size() - 1).setEnabled(enabled);
+				         }
+	    			}
+				});
+	    	}
+	    	else {
+	    		content.forEach(i->{
+	    			System.out.println(i);
+	    			Matcher checkedLine = pattern.matcher(i);
+	    			if (checkedLine.find()) {
+	    				System.out.println("Empty file, adding the entire list to json at the end of the operation");
+	    				boolean enabled = false;
+				         if(checkedLine.group(2).equals("1")) {
+				        	 enabled = true;
+				         }
+				         String[] additionalInfo = getAdditionalInfo(checkedLine.group(1));
+				         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+	    			}  
+	    		});
+	    		try {
+	    			addObjectToJson(modList);
+	    		} catch (Exception e) {
+	    			// TODO Auto-generated catch block
+	    			e.printStackTrace();
+	    		}
+	    	}
+    	} catch(IOException e) {
+    		e.printStackTrace();
+    	}
+    	
     }
     
     public String[] getAdditionalInfo(String code) {
@@ -65,7 +164,7 @@ public class ExtractModList {
     	//System.out.println(regexParser(titleRegex, html));
     	result[0] = regexParser(titleRegex, html);
     	
-    	Pattern authorRegex = Pattern.compile("<div class=\"friendBlockContent\">\\n(\\s*.*?)<br>");
+    	Pattern authorRegex = Pattern.compile("<div class=\"friendBlockContent\">\\n*(.*?)<br>", Pattern.DOTALL);
     	result[1] = regexParser(authorRegex, html);
     	//System.out.println(regexParser(authorRegex, html));
     	
@@ -76,12 +175,113 @@ public class ExtractModList {
     	return result;
     }
     
+    /******
+     * 
+     * @param pattern
+     * @param text
+     * @return
+     */
     public String regexParser(Pattern pattern, String text) {
     	Matcher matcher = pattern.matcher(text);
     	if(matcher.find()) {
     		return matcher.group(1);
     	}
     	else return "nothing found";
+    }
+    
+    public void createJsonFile() {
+    	try {
+		    File file = new File(jsonFile);
+		    if (file.createNewFile()) {
+		      System.out.println("File created: " + file.getName());
+		    } else {
+		      System.out.println("File already exists.");
+		    }
+	    } catch (IOException e) {
+	      System.out.println("An error occurred.");
+	      e.printStackTrace();
+	    }
+    }
+    
+    /***********
+     * 
+     * @param objectList
+     * @throws Exception
+     */
+    public void addObjectToJson(List<ModInfo> objectList) throws Exception {
+    	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 	
+    	FileWriter fw = new FileWriter(jsonFile);
+    	gson.toJson(objectList, fw);
+		fw.close();
+    }
+    
+    /**********
+     * 
+     * @param object
+     * @throws Exception
+     */
+    public void addObjectToJson(ModInfo object) throws Exception {
+    	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
+    	FileReader fr = new FileReader(jsonFile);
+        Type modInfoListType = new TypeToken<List<ModInfo>>(){}.getType();
+        List<ModInfo> oldJson = gson.fromJson(fr, modInfoListType);
+        fr.close();
+        
+        try {
+	        boolean exist = false;
+	        
+	        for(int i = 0; i < oldJson.size(); i++) {
+	        	if(object.getCode() == oldJson.get(i).getCode()) {
+	        		exist = true;
+	        	}
+	        }
+	        
+	        if(!exist) {    	  	
+        		FileWriter fw = new FileWriter(jsonFile);
+        		oldJson.add(object);
+        		gson.toJson(oldJson, fw);
+        		fw.close();   			
+	        }
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
+	        
+    }
+    
+    public ModInfo getObjectFromJson(String code) throws Exception {
+    	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
+    	FileReader fr = new FileReader(jsonFile);
+        Type modInfoListType = new TypeToken<List<ModInfo>>(){}.getType();
+        List<ModInfo> oldJson = gson.fromJson(fr, modInfoListType);
+        fr.close();
+        
+        try {
+	        boolean exist = false;
+	        for(int i = 0; i < oldJson.size(); i++) {
+	        	if(code.equals(oldJson.get(i).getCode())) {
+	        		return oldJson.get(i); 	
+	        	}
+	        }
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
+        
+        return new ModInfo("NULL", false);
+    }
+    
+    public boolean checkIfEmpty() {
+    	try {
+	    	BufferedReader br = new BufferedReader(new FileReader(jsonFile));
+	    	if (br.readLine() == null) {
+	    		br.close();
+	    		return true;
+	    	}
+	    	br.close();
+			return false;
+    	} catch(Exception e) {
+        	e.printStackTrace();
+        }
+    	return true;
     }
     
     /*public void runScript(String code, Config config) {
