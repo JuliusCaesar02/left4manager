@@ -80,7 +80,7 @@ public class ExtractModList {
     	try {
     		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
 			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName));
-			System.out.println(checkIfEmpty());
+			System.out.println("Is json file empty?" +checkIfEmpty());
 	    	if(!checkIfEmpty()) {
 	    		content.forEach(i->{
 	    			System.out.println(i);
