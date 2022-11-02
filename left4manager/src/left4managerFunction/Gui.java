@@ -4,10 +4,17 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
 import java.util.List;
 import java.util.Vector;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.table.*;
 
@@ -17,6 +24,7 @@ import com.sun.jna.platform.win32.WinReg;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -73,7 +81,7 @@ public class Gui {
 		//extractModList.getModList().get(0).setEnabled(true);
 	}
 	
-	public JScrollPane createTable() {
+	public DefaultTableModel createModel() {
 		DefaultTableModel model = new DefaultTableModel() {
 			private static final long serialVersionUID = 1L;
 
@@ -109,8 +117,6 @@ public class Gui {
 		model.addColumn("code");
 		model.addColumn("author");
 		model.addColumn("enabled");
-		JTable table = new JTable(model);
-		JScrollPane scrollPane = new JScrollPane(table); 
 		
 		model.addTableModelListener(new TableModelListener() {	
 			@Override
@@ -127,7 +133,59 @@ public class Gui {
 			model.addRow(modList.get(i).getObject());
 		}
 		
-		return scrollPane;
+		return model;
+	}
+	
+	public DefaultTableModel createOrderModel() {
+		DefaultTableModel model = new DefaultTableModel() {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+				switch (column) {
+		         	case 0:
+		         		return true;
+		         default:
+		             return false;
+		      }
+		    }
+			
+			@Override
+	         public Class getColumnClass(int columnIndex) {
+				switch (columnIndex) {
+	                case 0:
+	                	return String.class;
+	                case 1:
+	                case 2:
+	                    return String.class;
+	                default:
+	                    return String.class;
+				}
+	         }
+		}; 
+	
+		model.addColumn("order");
+		model.addColumn("name");
+		model.addColumn("code");
+		model.addColumn("author");
+		
+		model.addTableModelListener(new TableModelListener() {	
+			@Override
+			public void tableChanged(TableModelEvent tme) {
+				if (tme.getType() == TableModelEvent.UPDATE) {
+					System.out.println(tme.getFirstRow() + tme.getColumn() + (String) model.getValueAt(tme.getFirstRow(), tme.getColumn()));
+					extractModList.moveToIndex(tme.getFirstRow(), Integer.parseInt((String) model.getValueAt(tme.getFirstRow(), tme.getColumn())) - 1);
+					//TODO refresh
+				}
+			}
+		});
+
+		List<ModInfo> modList = extractModList.getModList();
+		for(int i = 0; i < modList.size(); i++) {
+			model.addRow(new Object[]{i + 1, modList.get(i).getName(), modList.get(i).getCode(), modList.get(i).getAuthor()});
+		}
+		
+		return model;
 	}
 	
 	public void chooseDirectoryWindow() {
@@ -241,7 +299,7 @@ public class Gui {
 	    tabbedPane.setBounds(50,50,200,200);  
 	    tabbedPane.add("List", createListTab());  
 	    tabbedPane.add("Group", tab2);  
-	    tabbedPane.add("Order", tab3);
+	    tabbedPane.add("Order", createOrderTab());
 	    tabbedPane.add("Options", tab4);
 		return tabbedPane;
 	}
@@ -257,12 +315,23 @@ public class Gui {
 		leftPane.setBackground(Color.green);
 		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
 		leftPane.add(selectAll);
-		leftPane.add(createTable());
+		JTable table = new JTable(createModel());
+		leftPane.add(new JScrollPane(table));
 		
 		JPanel rightPane = new JPanel(); 
 		rightPane.setBackground(Color.red);
 		JButton saveButton = new JButton("Save");
 		rightPane.add(saveButton);
+		
+		selectAll.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				TableModel model = table.getModel();
+				boolean selectedBool = selectAll.isSelected();
+					for(int i = 0; i < extractModList.getModList().size(); i++) {
+						model.setValueAt(selectedBool, i, 3);
+					}
+	        }  
+	    });  
 		
 		saveButton.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){  
@@ -282,6 +351,73 @@ public class Gui {
 		c.weightx = 0.6;
 		listPane.add(rightPane, c);
 		return listPane;
+	}
+	
+	public JPanel createOrderTab() {
+		JPanel mainPane = new JPanel();
+		
+		DefaultTableModel model = createOrderModel();
+		JTable table = new JTable(model);
+		
+		mainPane.add(new JScrollPane(table));
+		
+		JPanel buttonPane = new JPanel();
+		JButton up = new JButton("Up");	
+		up.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				changeModOrder(table, 1);
+			}  
+		}); 
+		buttonPane.add(up);
+		
+		JButton down = new JButton("Down");	
+		down.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				changeModOrder(table, -1);
+			}  
+		}); 
+		buttonPane.add(down);
+		
+		JButton top = new JButton("Top");	
+		top.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				changeModOrder(table, true);
+			}  
+		}); 
+		buttonPane.add(top);
+		
+		JButton bottom = new JButton("Bottom");	
+		bottom.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				changeModOrder(table, false);
+			}  
+		}); 
+		buttonPane.add(bottom);
+	
+		mainPane.add(buttonPane);
+		
+		return mainPane;
+	}
+	
+
+	public void changeModOrder(JTable table, int positionsMoved){
+		int finalPosition = table.getSelectedRow() - positionsMoved;
+		extractModList.moveToIndex(table.getSelectedRow(), finalPosition);
+		table.setModel(createOrderModel());
+		table.setRowSelectionInterval(finalPosition, finalPosition);
+	}
+	
+	public void changeModOrder(JTable table, boolean toTop){
+		if(toTop) {
+			extractModList.moveToTop(table.getSelectedRow());
+			table.setModel(createOrderModel());
+			table.setRowSelectionInterval(0, 0);
+		}
+		else {
+			extractModList.moveToBottom(table.getSelectedRow());
+			table.setModel(createOrderModel());
+			table.setRowSelectionInterval(extractModList.getModList().size() - 1, extractModList.getModList().size() - 1);
+		}
 	}
 	
 	//TODO riscrivere

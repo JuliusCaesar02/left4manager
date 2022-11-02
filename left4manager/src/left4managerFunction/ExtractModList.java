@@ -144,6 +144,22 @@ public class ExtractModList {
     	
     }
     
+    public void swapPosition(int first, int second) {
+    	Collections.swap(modList, first, second);
+    }
+    
+    public void moveToTop(int index) {
+    	 modList.add(0, modList.remove(index));
+    }
+    
+    public void moveToBottom(int index) {
+   	 	modList.add(modList.size() - 1, modList.remove(index));
+    }
+    
+    public void moveToIndex(int elementIndex, int position) {
+    	modList.add(position, modList.remove(elementIndex));
+    }
+    
     public String[] getAdditionalInfo(String code) {
     	String[] result = new String[3];
     	String html = null;
