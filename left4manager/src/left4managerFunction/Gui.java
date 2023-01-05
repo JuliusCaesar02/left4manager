@@ -4,15 +4,21 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -25,7 +31,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -36,7 +44,8 @@ import javax.swing.table.*;
 public class Gui {
 
 	private JFrame frame;
-	
+	JLabel imgLabel = new JLabel();
+	JTextPane textDescription = new JTextPane();
 	Config config = new Config();
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
@@ -81,7 +90,7 @@ public class Gui {
 		//extractModList.getModList().get(0).setEnabled(true);
 	}
 	
-	public DefaultTableModel createModel() {
+	/*public DefaultTableModel createModel() {
 		DefaultTableModel model = new DefaultTableModel() {
 			private static final long serialVersionUID = 1L;
 
@@ -96,7 +105,7 @@ public class Gui {
 	                    return true;
 	                default:
 	                    return false;
-        }
+				}
 		    }
 			@Override
 	         public Class getColumnClass(int columnIndex) {
@@ -126,15 +135,17 @@ public class Gui {
 					extractModList.getModList().get(tme.getFirstRow()).setEnabled(newValue);
 				}
 			}
+			
+			
 		});
-
+		
 		List<ModInfo> modList = extractModList.getModList();
 		for(int i=0; i<modList.size(); i++) {
 			model.addRow(modList.get(i).getObject());
 		}
 		
 		return model;
-	}
+	}*/
 	
 	public DefaultTableModel createOrderModel() {
 		DefaultTableModel model = new DefaultTableModel() {
@@ -298,7 +309,7 @@ public class Gui {
 	    JTabbedPane tabbedPane = new JTabbedPane();  
 	    tabbedPane.setBounds(50,50,200,200);  
 	    tabbedPane.add("List", createListTab());  
-	    tabbedPane.add("Group", tab2);  
+	    tabbedPane.add("Group", createGroupTab());  
 	    tabbedPane.add("Order", createOrderTab());
 	    tabbedPane.add("Options", tab4);
 		return tabbedPane;
@@ -307,7 +318,7 @@ public class Gui {
 	public JPanel createListTab() {
 		JPanel listPane = new JPanel(); 
 		listPane.setBackground(Color.cyan);
-		listPane.setLayout(new GridBagLayout());
+		listPane.setLayout(new GridLayout(0, 2));
 		JCheckBox selectAll = new JCheckBox("Select all");  
 		selectAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		
@@ -315,12 +326,22 @@ public class Gui {
 		leftPane.setBackground(Color.green);
 		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
 		leftPane.add(selectAll);
-		JTable table = new JTable(createModel());
+		
+		GroupModListModel model = new GroupModListModel();
+		model.add(extractModList.getModList());
+		JTable table = new JTable(model);
+		table.setShowGrid(false);
+		table.setShowHorizontalLines(true);
+
 		leftPane.add(new JScrollPane(table));
 		
 		JPanel rightPane = new JPanel(); 
+		JPanel descriptionPane = new JPanel(); 
+		descriptionPane.add(imgLabel);
+		descriptionPane.add(textDescription);	
 		rightPane.setBackground(Color.red);
 		JButton saveButton = new JButton("Save");
+		rightPane.add(new JScrollPane(descriptionPane));
 		rightPane.add(saveButton);
 		
 		selectAll.addActionListener(new ActionListener(){  
@@ -333,29 +354,38 @@ public class Gui {
 	        }  
 	    });  
 		
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	        public void valueChanged(ListSelectionEvent event) {
+	        	String code = table.getValueAt(table.getSelectedRow(), 1).toString();
+		    	BufferedImage img = null;
+				try {
+					img = ImageIO.read(new File(config.getL4D2Dir() +"left4dead2" +File.separator +"addons" +File.separator +"workshop" +File.separator +code +".jpg"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				imgLabel.setIcon(new ImageIcon(img));
+				//imgLabel.setIcon(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_DEFAULT)));
+				//textDescription.setText(extractModList.getModList().get(table.getSelectedRow()).getDescription());
+				textDescription.setEditable(false);
+			}
+		});
+			
 		saveButton.addActionListener(new ActionListener(){  
 			public void actionPerformed(ActionEvent e){  
 				updateModFile.writeFile(updateModFile.buildString(extractModList.getModList()));
 	        }  
 	    });  
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.FIRST_LINE_START;
-		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 0;
-		c.weightx = 0.4;
-		c.weighty = 1;
-		listPane.add(leftPane, c);
-		
-		c.gridx = 1;
-		c.weightx = 0.6;
-		listPane.add(rightPane, c);
+
+		listPane.add(leftPane);
+		listPane.add(rightPane);
 		return listPane;
 	}
 	
+	
 	public JPanel createOrderTab() {
 		JPanel mainPane = new JPanel();
-		
+				
 		DefaultTableModel model = createOrderModel();
 		JTable table = new JTable(model);
 		
@@ -418,6 +448,185 @@ public class Gui {
 			table.setModel(createOrderModel());
 			table.setRowSelectionInterval(extractModList.getModList().size() - 1, extractModList.getModList().size() - 1);
 		}
+	}
+	
+	
+	
+	public JPanel createGroupTab() {
+		List<ModGroup> groupList = new ArrayList<ModGroup>();
+		groupList.add(new ModGroup("Gruppo1", 0, extractModList.getModList()));
+		groupList.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
+		
+		JPanel groupPanel = new JPanel();
+		
+		groupPanel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		JPanel column = new JPanel();
+		column.setLayout(new BorderLayout());
+		column.setBackground(Color.red);
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.weightx = 0.10;
+		c.weighty = 1;
+		
+		DefaultListModel listModel = new DefaultListModel();
+		for(int i = 0; i < groupList.size(); i++) {
+			listModel.addElement(groupList.get(i).getGroupName());
+		}
+		JList groupJList = new JList(listModel);
+		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		groupJList.setSelectedIndex(0);
+		groupJList.setVisibleRowCount(5);
+        JScrollPane listScrollPane = new JScrollPane(groupJList);
+        listScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BorderLayout());
+        JButton addGroup = new JButton("Add group");
+        JButton removeGroup = new JButton("Remove group");
+        buttonPanel.add(addGroup, BorderLayout.LINE_START);
+        buttonPanel.add(removeGroup, BorderLayout.LINE_END);
+        column.add(buttonPanel, BorderLayout.PAGE_END);
+        
+        
+		column.add(listScrollPane, BorderLayout.CENTER);
+		groupPanel.add(column, c);
+		
+		JPanel column2 = new JPanel();
+		column2.setBackground(Color.green);
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.LINE_END; //bottom of space
+		c.weightx = 1;
+		c.weighty = 1;
+		column2.add(createModGroupTable(groupList.get(0)));
+		
+		groupPanel.add(column2, c);
+		
+		return groupPanel;
+	}
+	
+	public static class GroupModListModel extends AbstractTableModel {
+		
+		protected static final String[] COLUMN_NAMES = {
+				"Name",
+				"Code",
+				"Author",
+				"Enabled"
+		};
+		
+		private List<ModInfo> rowData;
+		
+		public GroupModListModel() {
+			rowData = new ArrayList<>();
+		}
+		
+		@Override
+	    public boolean isCellEditable(int row, int column) {
+			switch (column) {
+                case 0:           
+                case 1:
+                case 2:
+                    return false;
+                case 3:
+                    return true;
+                default:
+                    return false;
+			}
+	    }
+		
+		@Override
+        public Class<?> getColumnClass(int columnIndex) {
+			switch (columnIndex) {
+               case 0:
+               case 1:
+               case 2:
+                   return String.class;
+               case 3:
+                   return Boolean.class;
+               default:
+                   return String.class;
+			}
+        }
+		
+		public void add(List<ModInfo> mods) {
+			rowData.addAll(mods);
+			fireTableDataChanged();
+		}
+		
+		public void add(ModInfo... pd) {
+		    add(Arrays.asList(pd));
+		}
+		
+		@Override
+		public int getRowCount() {
+			return rowData.size();
+		}
+		
+		@Override
+		public int getColumnCount() {
+			return COLUMN_NAMES.length;
+		}
+		
+		@Override
+		public String getColumnName(int column) {
+			return COLUMN_NAMES[column];
+		}
+		
+		public ModInfo getRow(int row) {
+			return rowData.get(row);
+		}
+		
+		@Override
+		public void setValueAt(Object value, int row, int column) {
+			switch (column) {
+            case 0:           
+            case 1:
+            case 2:
+                break;
+            case 3:
+            	getRow(row).setEnabled((boolean) value);
+                fireTableCellUpdated(row, column);
+            default:
+                break;
+		}
+			
+		}
+		
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			ModInfo mod = getRow(rowIndex);
+			Object value = null;
+			switch (columnIndex) {
+			case 0:
+				value = mod.getName();
+				break;
+			case 1:
+				value = mod.getCode();
+				break;
+			case 2:
+				value = mod.getAuthor();
+				break;
+			case 3:
+				value = mod.getEnabled();
+				break;
+			}
+			return value;
+		}
+	}
+	
+	public JScrollPane createModGroupTable(ModGroup modGroup) {
+		GroupModListModel model = new GroupModListModel();
+		model.add(modGroup.getGroupModList());
+		JTable modGroupTable = new JTable(model);
+		modGroupTable.setShowGrid(false);
+		modGroupTable.setShowHorizontalLines(false);
+		modGroupTable.setShowVerticalLines(false);
+		modGroupTable.setRowMargin(0);
+		modGroupTable.setIntercellSpacing(new Dimension(0, 0));
+		modGroupTable.setFillsViewportHeight(true);
+		JScrollPane tableScrollPane = new JScrollPane(modGroupTable);
+		return tableScrollPane;
 	}
 	
 	//TODO riscrivere

@@ -6,20 +6,24 @@ import java.util.List;
 public class ModGroup {
 	private List<ModInfo> groupModList = new ArrayList<ModInfo>();
 	private String groupName = new String();
-	private List<ModInfo> modList;
 	
-	public ModGroup(String groupName, ExtractModList modList) {
+	public ModGroup(String groupName, int modNumber, List<ModInfo> modList) {
 		this.groupName = groupName;
-		this.modList = modList.getModList();
+		addModToList(modNumber, modList);
 	}
 	
-	public void addModToList(int modNumber) {
+	public ModGroup(String groupName, int[] modNumber, List<ModInfo> modList) {
+		this.groupName = groupName;
+		addModToList(modNumber, modList);
+	}
+	
+	public void addModToList(int modNumber, List<ModInfo> modList) {
 		this.groupModList.add(modList.get(modNumber));
 	}
 	
-	public void addModToList(int[] modNumber) {
+	public void addModToList(int[] modNumber, List<ModInfo> modList) {
 		for(int i = 0; i < modNumber.length; i++) {
-			addModToList(modNumber[i]);
+			addModToList(modNumber[i], modList);
 		}
 	}
 	
@@ -39,5 +43,13 @@ public class ModGroup {
 	
 	public String getGroupName() {
 		return this.groupName;
+	}
+	
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+	
+	public List<ModInfo> getGroupModList() {
+		return this.groupModList;
 	}
 }
