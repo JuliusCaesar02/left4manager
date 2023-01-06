@@ -17,13 +17,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.swing.table.*;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
@@ -89,63 +101,6 @@ public class Gui {
 		//System.out.print(group1.getGroupMod(0).getEnabled());
 		//extractModList.getModList().get(0).setEnabled(true);
 	}
-	
-	/*public DefaultTableModel createModel() {
-		DefaultTableModel model = new DefaultTableModel() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-		    public boolean isCellEditable(int row, int column) {
-				switch (column) {
-	                case 0:           
-	                case 1:
-	                case 2:
-	                    return false;
-	                case 3:
-	                    return true;
-	                default:
-	                    return false;
-				}
-		    }
-			@Override
-	         public Class getColumnClass(int columnIndex) {
-				switch (columnIndex) {
-	                case 0:
-	                case 1:
-	                case 2:
-	                    return String.class;
-	                case 3:
-	                    return Boolean.class;
-	                default:
-	                    return String.class;
-				}
-	         }
-		}; 
-	
-		model.addColumn("name");
-		model.addColumn("code");
-		model.addColumn("author");
-		model.addColumn("enabled");
-		
-		model.addTableModelListener(new TableModelListener() {	
-			@Override
-			public void tableChanged(TableModelEvent tme) {
-				if (tme.getType() == TableModelEvent.UPDATE) {
-					boolean newValue = (Boolean) model.getValueAt(tme.getFirstRow(),tme.getColumn());
-					extractModList.getModList().get(tme.getFirstRow()).setEnabled(newValue);
-				}
-			}
-			
-			
-		});
-		
-		List<ModInfo> modList = extractModList.getModList();
-		for(int i=0; i<modList.size(); i++) {
-			model.addRow(modList.get(i).getObject());
-		}
-		
-		return model;
-	}*/
 	
 	public DefaultTableModel createOrderModel() {
 		DefaultTableModel model = new DefaultTableModel() {
@@ -290,7 +245,7 @@ public class Gui {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-		
+				
 		frame = new JFrame("Left4Manager");
 		frame.setBounds(200, 200, 1080, 720);
 		frame.setLocationRelativeTo(null);
@@ -300,6 +255,8 @@ public class Gui {
 		
 		debug();
 	}
+	
+	
 	
 	public JTabbedPane createTabbedPane() {
 		JPanel tab1 = new JPanel();  
@@ -327,11 +284,13 @@ public class Gui {
 		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
 		leftPane.add(selectAll);
 		
-		GroupModListModel model = new GroupModListModel();
+		GroupModTableModel model = new GroupModTableModel();
 		model.add(extractModList.getModList());
+		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(model);
 		JTable table = new JTable(model);
 		table.setShowGrid(false);
 		table.setShowHorizontalLines(true);
+		table.setRowSorter(sorter);
 
 		leftPane.add(new JScrollPane(table));
 		
@@ -453,9 +412,14 @@ public class Gui {
 	
 	
 	public JPanel createGroupTab() {
+		GroupModTableModel model = new GroupModTableModel(); 
+		JTable table = new JTable(model);
+
 		List<ModGroup> groupList = new ArrayList<ModGroup>();
-		groupList.add(new ModGroup("Gruppo1", 0, extractModList.getModList()));
+		int[] array = new int[] {1, 5, 7, 8};
+		groupList.add(new ModGroup("Gruppo1", array, extractModList.getModList()));
 		groupList.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
+
 		
 		JPanel groupPanel = new JPanel();
 		
@@ -475,6 +439,16 @@ public class Gui {
 			listModel.addElement(groupList.get(i).getGroupName());
 		}
 		JList groupJList = new JList(listModel);
+		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
+		
+		groupJList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+            	model.clear();
+            	model.add(groupList.get(groupJList.getMinSelectionIndex()).getGroupModList());
+	        }
+	    });
+		
 		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		groupJList.setSelectedIndex(0);
 		groupJList.setVisibleRowCount(5);
@@ -493,20 +467,30 @@ public class Gui {
 		column.add(listScrollPane, BorderLayout.CENTER);
 		groupPanel.add(column, c);
 		
+		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(model);
+		table.setRowSorter(sorter);
+		table.setShowGrid(false);
+		table.setShowHorizontalLines(false);
+		table.setShowVerticalLines(false);
+		table.setRowMargin(0);
+		table.setIntercellSpacing(new Dimension(0, 0));
+		table.setFillsViewportHeight(true);
+		JScrollPane tableScrollPane = new JScrollPane(table);
+		
 		JPanel column2 = new JPanel();
-		column2.setBackground(Color.green);
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.LINE_END; //bottom of space
 		c.weightx = 1;
 		c.weighty = 1;
-		column2.add(createModGroupTable(groupList.get(0)));
-		
+		column2.setBackground(Color.green);
+		column2.setLayout(new BorderLayout());
+		column2.add(tableScrollPane, BorderLayout.CENTER);
 		groupPanel.add(column2, c);
 		
 		return groupPanel;
 	}
 	
-	public static class GroupModListModel extends AbstractTableModel {
+	public static class GroupModTableModel extends AbstractTableModel {
 		
 		protected static final String[] COLUMN_NAMES = {
 				"Name",
@@ -517,7 +501,7 @@ public class Gui {
 		
 		private List<ModInfo> rowData;
 		
-		public GroupModListModel() {
+		public GroupModTableModel() {
 			rowData = new ArrayList<>();
 		}
 		
@@ -557,7 +541,9 @@ public class Gui {
 		public void add(ModInfo... pd) {
 		    add(Arrays.asList(pd));
 		}
-		
+		public void clear() {
+			rowData.clear();
+		}
 		@Override
 		public int getRowCount() {
 			return rowData.size();
@@ -589,8 +575,7 @@ public class Gui {
                 fireTableCellUpdated(row, column);
             default:
                 break;
-		}
-			
+			}
 		}
 		
 		@Override
@@ -615,26 +600,38 @@ public class Gui {
 		}
 	}
 	
-	public JScrollPane createModGroupTable(ModGroup modGroup) {
-		GroupModListModel model = new GroupModListModel();
-		model.add(modGroup.getGroupModList());
-		JTable modGroupTable = new JTable(model);
-		modGroupTable.setShowGrid(false);
-		modGroupTable.setShowHorizontalLines(false);
-		modGroupTable.setShowVerticalLines(false);
-		modGroupTable.setRowMargin(0);
-		modGroupTable.setIntercellSpacing(new Dimension(0, 0));
-		modGroupTable.setFillsViewportHeight(true);
-		JScrollPane tableScrollPane = new JScrollPane(modGroupTable);
-		return tableScrollPane;
-	}
-	
-	//TODO riscrivere
-	/*private void enableAll(boolean value) {
-		DefaultTableModel model = createTableModel();
-		for(int i = 0; i < model.getRowCount(); i++) {
-			model.setValueAt(Boolean.valueOf(value), i, 3);
+	/*public List<ModGroup> readModGroupFile() {
+		List<ModGroup> groupList = new ArrayList<ModGroup>();
+
+		try {
+			Gson modGroup = new GsonBuilder().setPrettyPrinting().create(); 
+	    	FileReader fr = new FileReader(config.getL4managerDir() +File.separator +"modGroup.json");
+	        Type modGroupListType = new TypeToken<List<ModGroup>>(){}.getType();
+	        groupList = modGroup.fromJson(fr, modGroupListType);
+			System.out.println(groupList.get(0).getGroupName());
+
+	        fr.close();
+
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		System.out.print(model.getValueAt(0,2)); 
+		return groupList;
+	}*/
+	
+	/*public void writeModGroupFile(List<ModGroup> object) throws FileNotFoundException {
+		config.createFile("modGroup.json");
+		
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();         
+    	FileWriter fw;
+		try {
+			fw = new FileWriter(config.getL4managerDir() +File.separator +"modGroup.json");
+			gson.toJson(object, fw);
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}*/
 }

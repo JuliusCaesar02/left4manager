@@ -47,9 +47,9 @@ public class Config {
 		return this.addonsFileName;
 	}
 	
-	public void createFile() {
+	public void createFile(String name) {
 		try {
-		    File myObj = new File(this.l4managerDir +File.separator + "config.txt");
+		    File myObj = new File(this.l4managerDir +File.separator + name);
 		    if (myObj.createNewFile()) {
 		      System.out.println("File created: " + myObj.getName());
 		    } else {
@@ -62,7 +62,7 @@ public class Config {
 	}
 	
 	public void writeFile() {
-		createFile();
+		createFile("config.txt");
 		try {
 			FileWriter fw = new FileWriter(this.l4managerDir +File.separator + "config.txt");
 			fw.write(buildString());

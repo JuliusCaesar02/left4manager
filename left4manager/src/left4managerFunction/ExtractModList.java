@@ -272,7 +272,6 @@ public class ExtractModList {
         fr.close();
         
         try {
-	        boolean exist = false;
 	        for(int i = 0; i < oldJson.size(); i++) {
 	        	if(code.equals(oldJson.get(i).getCode())) {
 	        		return oldJson.get(i); 	
