@@ -419,7 +419,13 @@ public class Gui {
 		int[] array = new int[] {1, 5, 7, 8};
 		groupList.add(new ModGroup("Gruppo1", array, extractModList.getModList()));
 		groupList.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
-
+		
+		try {
+			writeModGroupFile(groupList);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		JPanel groupPanel = new JPanel();
 		
@@ -445,7 +451,18 @@ public class Gui {
             @Override
             public void valueChanged(ListSelectionEvent e) {
             	model.clear();
-            	model.add(groupList.get(groupJList.getMinSelectionIndex()).getGroupModList());
+            	List<ModInfo> newModList = new ArrayList<ModInfo>();
+        		List<ModInfo> modList = extractModList.getModList();
+            	ModGroup selectedGroup = groupList.get(groupJList.getMinSelectionIndex());
+            	for(int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
+            		for(int j = 0; j < modList.size(); j++) {
+            			if(modList.get(j).getCode() == selectedGroup.getGroupMod(i)) {
+            				newModList.add(modList.get(j));
+            				break;
+            			}
+            		}
+            	}
+            	model.add(newModList);
 	        }
 	    });
 		
@@ -620,7 +637,7 @@ public class Gui {
 		return groupList;
 	}*/
 	
-	/*public void writeModGroupFile(List<ModGroup> object) throws FileNotFoundException {
+	public void writeModGroupFile(List<ModGroup> object) throws FileNotFoundException {
 		config.createFile("modGroup.json");
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();         
@@ -633,5 +650,5 @@ public class Gui {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}*/
+	}
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModGroup {
-	private List<ModInfo> groupModList = new ArrayList<ModInfo>();
+	private List<String> groupModList = new ArrayList<String>();
 	private String groupName = new String();
 	
 	public ModGroup(String groupName, int modNumber, List<ModInfo> modList) {
@@ -18,7 +18,7 @@ public class ModGroup {
 	}
 	
 	public void addModToList(int modNumber, List<ModInfo> modList) {
-		this.groupModList.add(modList.get(modNumber));
+		this.groupModList.add(modList.get(modNumber).getCode());
 	}
 	
 	public void addModToList(int[] modNumber, List<ModInfo> modList) {
@@ -37,7 +37,7 @@ public class ModGroup {
 		}
 	}
 	
-	public ModInfo getGroupMod(int index){
+	public String getGroupMod(int index){
 		return this.groupModList.get(index);
 	}
 	
@@ -49,7 +49,7 @@ public class ModGroup {
 		this.groupName = groupName;
 	}
 	
-	public List<ModInfo> getGroupModList() {
+	public List<String> getGroupModList() {
 		return this.groupModList;
 	}
 }
