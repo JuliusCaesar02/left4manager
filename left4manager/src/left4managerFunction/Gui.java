@@ -61,6 +61,7 @@ public class Gui {
 	Config config = new Config();
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
+	List<ModGroup> groupList = new ArrayList<ModGroup>();
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -245,7 +246,7 @@ public class Gui {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-				
+
 		frame = new JFrame("Left4Manager");
 		frame.setBounds(200, 200, 1080, 720);
 		frame.setLocationRelativeTo(null);
@@ -415,10 +416,10 @@ public class Gui {
 		GroupModTableModel model = new GroupModTableModel(); 
 		JTable table = new JTable(model);
 
-		List<ModGroup> groupList = new ArrayList<ModGroup>();
 		int[] array = new int[] {1, 5, 7, 8};
 		groupList.add(new ModGroup("Gruppo1", array, extractModList.getModList()));
 		groupList.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
+		System.out.println(groupList.size());
 		
 		try {
 			writeModGroupFile(groupList);
@@ -455,11 +456,9 @@ public class Gui {
         		List<ModInfo> modList = extractModList.getModList();
             	ModGroup selectedGroup = groupList.get(groupJList.getMinSelectionIndex());
             	for(int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
-            		for(int j = 0; j < modList.size(); j++) {
-            			if(modList.get(j).getCode() == selectedGroup.getGroupMod(i)) {
-            				newModList.add(modList.get(j));
-            				break;
-            			}
+            		int index = extractModList.getModIndexByCode(selectedGroup.getGroupMod(i));
+            		if(index != -1) {
+            			newModList.add(modList.get(index));
             		}
             	}
             	model.add(newModList);
@@ -474,9 +473,29 @@ public class Gui {
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BorderLayout());
+        
         JButton addGroup = new JButton("Add group");
+        addGroup.addActionListener(new ActionListener() {
+        	
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		addNewGroupPopUp();
+        	}
+        });
+        
         JButton removeGroup = new JButton("Remove group");
+        removeGroup.addActionListener(new ActionListener() {
+        	
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		//groupList.remove(groupJList.getMinSelectionIndex());
+        		//((DefaultListModel) groupJList.getModel()).remove(groupJList.getMinSelectionIndex());
+        	}
+        });
+        
         buttonPanel.add(addGroup, BorderLayout.LINE_START);
+        
+        
         buttonPanel.add(removeGroup, BorderLayout.LINE_END);
         column.add(buttonPanel, BorderLayout.PAGE_END);
         
@@ -507,6 +526,115 @@ public class Gui {
 		return groupPanel;
 	}
 	
+	public void addNewGroupPopUp() {
+		GroupModTableModel allModModel = new GroupModTableModel(1); 
+		GroupModTableModel newGroupModel = new GroupModTableModel(1); 
+		
+		JFrame addNewGroupFrame = new JFrame("Add new group");
+		addNewGroupFrame.setVisible(true);
+		addNewGroupFrame.setBounds(0, 0, 800, 500);	
+		addNewGroupFrame.setLocationRelativeTo(null);
+		addNewGroupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		addNewGroupFrame.setLayout(new BoxLayout(addNewGroupFrame.getContentPane(), BoxLayout.PAGE_AXIS));
+		
+		JPanel groupNamePane = new JPanel();
+		groupNamePane.setLayout(new BorderLayout());
+		JLabel groupNameLabel = new JLabel("Group name");
+		JTextField groupNameInput = new JTextField();
+		groupNameInput.setText("Group" +(groupList.size() + 1));
+
+		groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
+		groupNamePane.add(groupNameInput);
+		
+		JPanel tablePane = new JPanel();
+		tablePane.setLayout(new BoxLayout(tablePane, BoxLayout.LINE_AXIS));
+		
+		JTable allModTable = new JTable(allModModel);
+		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(allModModel);
+		allModTable.setRowSorter(sorter);
+		allModModel.add(extractModList.getModList());
+		
+		JTable groupModTable = new JTable(newGroupModel);
+		TableRowSorter<GroupModTableModel> sorter2 = new TableRowSorter<>(newGroupModel);
+		groupModTable.setRowSorter(sorter2);
+		
+		JPanel swapButtonsPanel = new JPanel();
+		swapButtonsPanel.setLayout(new BoxLayout(swapButtonsPanel, BoxLayout.PAGE_AXIS));
+		JButton addButton = new JButton("Add");
+		addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		addButton.addActionListener(new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+            	int[] selectedRows = allModTable.getSelectedRows();
+					newGroupModel.add(allModModel.getRow(selectedRows));
+					allModModel.remove(selectedRows);
+        	}
+        });
+		JButton removeButton = new JButton("Remove");
+		removeButton.addActionListener(new ActionListener() {
+			@Override
+        	public void actionPerformed(ActionEvent e) {
+            	int[] selectedRows = groupModTable.getSelectedRows();
+        		allModModel.add(newGroupModel.getRow(selectedRows));
+        		newGroupModel.remove(selectedRows);
+			}
+		});
+		removeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		swapButtonsPanel.add(addButton);
+		swapButtonsPanel.add(removeButton);
+				
+		JPanel leftTable = new JPanel();
+		leftTable.setLayout(new BoxLayout(leftTable, BoxLayout.PAGE_AXIS));
+		JScrollPane scrollPane = new JScrollPane(allModTable);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JLabel label = new JLabel("All mods");
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		leftTable.add(label);
+		leftTable.add(scrollPane);
+
+		JPanel rightTable = new JPanel();
+		rightTable.setLayout(new BoxLayout(rightTable, BoxLayout.PAGE_AXIS));
+		JScrollPane scrollPane2 = new JScrollPane(groupModTable);
+		scrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane2.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JLabel label2 = new JLabel("New group mods");
+		label2.setAlignmentX(Component.CENTER_ALIGNMENT);
+		rightTable.add(label2);
+		rightTable.add(scrollPane2);
+		
+		tablePane.add(leftTable);
+		tablePane.add(swapButtonsPanel);
+		tablePane.add(rightTable);
+		
+		JPanel buttonsPane = new JPanel();
+		JButton applyButton = new JButton("Confirm");
+		applyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ModGroup newGroup = new ModGroup(groupNameInput.getText());
+				for(int i = 0; i < newGroupModel.getRowCount(); i++) {
+					newGroup.addModToList(newGroupModel.getRow(i).getCode());
+				}
+				groupList.add(newGroup);
+				addNewGroupFrame.dispose();
+			}
+		});
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addNewGroupFrame.dispose();
+			}
+		});
+		buttonsPane.add(cancelButton);
+		buttonsPane.add(applyButton);
+
+		addNewGroupFrame.add(groupNamePane);
+		addNewGroupFrame.add(tablePane);
+		addNewGroupFrame.add(buttonsPane);
+	}
+	
 	public static class GroupModTableModel extends AbstractTableModel {
 		
 		protected static final String[] COLUMN_NAMES = {
@@ -517,11 +645,18 @@ public class Gui {
 		};
 		
 		private List<ModInfo> rowData;
+		private int columnCount;
 		
 		public GroupModTableModel() {
 			rowData = new ArrayList<>();
+			this.columnCount = COLUMN_NAMES.length;
 		}
 		
+		public GroupModTableModel(int columnCount) {
+			rowData = new ArrayList<>();
+			this.columnCount = columnCount;
+		}
+
 		@Override
 	    public boolean isCellEditable(int row, int column) {
 			switch (column) {
@@ -558,9 +693,23 @@ public class Gui {
 		public void add(ModInfo... pd) {
 		    add(Arrays.asList(pd));
 		}
+		
 		public void clear() {
 			rowData.clear();
+			fireTableDataChanged();
 		}
+		
+		public void remove(int[] index) {
+			for(int i = 0; i < index.length; i++) {
+				remove(index[i] - i);
+			}
+		}
+		
+		public void remove(int index) {
+			rowData.remove(index);
+			fireTableDataChanged();
+		}
+		
 		@Override
 		public int getRowCount() {
 			return rowData.size();
@@ -568,7 +717,7 @@ public class Gui {
 		
 		@Override
 		public int getColumnCount() {
-			return COLUMN_NAMES.length;
+			return this.columnCount;
 		}
 		
 		@Override
@@ -578,6 +727,14 @@ public class Gui {
 		
 		public ModInfo getRow(int row) {
 			return rowData.get(row);
+		}
+		
+		public List<ModInfo> getRow(int[] row){
+			List<ModInfo> mods = new ArrayList<>();
+			for(int i = 0; i < row.length; i++) {
+				mods.add(getRow(row[i]));
+			}
+			return mods;
 		}
 		
 		@Override

@@ -35,6 +35,24 @@ public class ExtractModList {
     	return this.modList;
     }
     
+    public ModInfo getModInfoByCode(String code) {
+    	for(int i = 0; i < this.modList.size(); i++) {
+    		if(this.modList.get(i).getCode().equals(code)) {
+    			return this.modList.get(i);
+    		}
+    	}
+		return null;
+    }
+    
+    public int getModIndexByCode(String code) {
+    	for(int i = 0; i < this.modList.size(); i++) {
+    		if(this.modList.get(i).getCode().equals(code)) {
+    			return i;
+    		}
+    	}
+		return -1;
+    }
+    
     /*public void populateModList() throws Exception {
     	createJsonFile();
     	

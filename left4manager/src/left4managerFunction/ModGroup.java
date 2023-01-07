@@ -7,6 +7,13 @@ public class ModGroup {
 	private List<String> groupModList = new ArrayList<String>();
 	private String groupName = new String();
 	
+	public ModGroup() {
+	}
+	
+	public ModGroup(String groupName) {
+		this.groupName = groupName;
+	}
+	
 	public ModGroup(String groupName, int modNumber, List<ModInfo> modList) {
 		this.groupName = groupName;
 		addModToList(modNumber, modList);
@@ -17,23 +24,27 @@ public class ModGroup {
 		addModToList(modNumber, modList);
 	}
 	
-	public void addModToList(int modNumber, List<ModInfo> modList) {
-		this.groupModList.add(modList.get(modNumber).getCode());
+	public void addModToList(int index, List<ModInfo> modList) {
+		this.groupModList.add(modList.get(index).getCode());
 	}
 	
-	public void addModToList(int[] modNumber, List<ModInfo> modList) {
-		for(int i = 0; i < modNumber.length; i++) {
-			addModToList(modNumber[i], modList);
+	public void addModToList(String code) {
+		this.groupModList.add(code);
+	}
+	
+	public void addModToList(int[] index, List<ModInfo> modList) {
+		for(int i = 0; i < index.length; i++) {
+			addModToList(index[i], modList);
 		}
 	}
 	
-	public void removeModToList(int listNumber) {
+	public void removeModByList(int listNumber) {
 		this.groupModList.remove(listNumber);
 	}
 	
-	public void removeModToList(int[] modNumber) {
+	public void removeModByList(int[] modNumber) {
 		for(int i = 0; i < modNumber.length; i++) {
-			removeModToList(modNumber[i]);
+			removeModByList(modNumber[i]);
 		}
 	}
 	
