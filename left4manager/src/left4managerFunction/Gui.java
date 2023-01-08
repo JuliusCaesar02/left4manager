@@ -410,7 +410,62 @@ public class Gui {
 		}
 	}
 	
+	public static class GroupListModel extends AbstractListModel {
+		private List<ModGroup> rowData;
+		
+		public GroupListModel() {
+			rowData = new ArrayList<ModGroup>();
+		}
+		
+		public GroupListModel(List<ModGroup> data) {
+			this.rowData = new ArrayList<ModGroup>();
+			add(data);
+		}
+		
+		@Override
+		public int getSize() {
+			return rowData.size();
+		}
+
+		@Override
+		public ModGroup getElementAt(int index) {
+			return rowData.get(index);
+		}
+		
+		public ModGroup getLastElement() {
+			return rowData.get(getSize() - 1);
+		}
+		
+		public ModGroup getFirstElement() {
+			return rowData.get(0);
+		}
+		
+		public void add(List<ModGroup> data) {
+			int oldLenght = getSize() - 1;
+			rowData.addAll(data);
+			fireIntervalAdded(this, oldLenght, getSize());
+		}
+		
+		public void add(ModGroup... pd) {
+		    add(Arrays.asList(pd));
+		}
+		
+		public void remove(int index) {
+			rowData.remove(index);
+			fireIntervalRemoved(this, index, index);
+		}
 	
+		public void clear() {
+			rowData.clear();
+			fireIntervalRemoved(this, 0, getSize());
+		}
+		
+		public void refresh(List<ModGroup> data) {
+			rowData.clear();
+			rowData.addAll(data);
+			fireIntervalAdded(this, 0, getSize());
+		}
+	}
 	
 	public JPanel createGroupTab() {
 		GroupModTableModel model = new GroupModTableModel(); 
@@ -441,11 +496,31 @@ public class Gui {
 		c.weightx = 0.10;
 		c.weighty = 1;
 		
-		DefaultListModel listModel = new DefaultListModel();
-		for(int i = 0; i < groupList.size(); i++) {
-			listModel.addElement(groupList.get(i).getGroupName());
-		}
+		GroupListModel listModel = new GroupListModel();
+		listModel.refresh(groupList);
+		
 		JList groupJList = new JList(listModel);
+		
+		ListCellRenderer groupListRenderer = new ListCellRenderer<ModGroup>() {
+			@Override
+			public Component getListCellRendererComponent(JList<? extends ModGroup> list, ModGroup value, int index,
+				boolean isSelected, boolean cellHasFocus) {
+				JLabel label = new JLabel(value.getGroupName());
+				if (isSelected) {
+					label.setBackground(list.getSelectionBackground());
+					label.setForeground(list.getSelectionForeground());
+				} else {
+					label.setBackground(list.getBackground());
+					label.setForeground(list.getForeground());
+		        }
+				label.setEnabled(list.isEnabled());
+				label.setFont(list.getFont());
+				label.setOpaque(true);
+				return label;
+			}
+		};
+
+		groupJList.setCellRenderer(groupListRenderer);
 		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 		
 		groupJList.addListSelectionListener(new ListSelectionListener() {
@@ -485,11 +560,12 @@ public class Gui {
         
         JButton removeGroup = new JButton("Remove group");
         removeGroup.addActionListener(new ActionListener() {
-        	
         	@Override
         	public void actionPerformed(ActionEvent e) {
-        		//groupList.remove(groupJList.getMinSelectionIndex());
-        		//((DefaultListModel) groupJList.getModel()).remove(groupJList.getMinSelectionIndex());
+        		if (groupJList.getMinSelectionIndex() >= 0) {
+        			groupList.remove(groupJList.getMinSelectionIndex());
+        			listModel.refresh(groupList);
+        		}
         	}
         });
         
