@@ -458,6 +458,16 @@ public class Gui {
 			rowData.remove(index);
 			fireIntervalRemoved(this, index, index);
 		}
+		
+		public void removeModByIndex(int groupIndex, int modIndex) {
+			rowData.get(groupIndex).remove(modIndex);
+		}
+		
+		public void removeModByIndex(int groupIndex, int[] index) {
+			for(int i = 0; i < index.length; i++) {
+				rowData.get(groupIndex).remove(index[i] - i);
+			}
+		}
 	
 		public void clear() {
 			rowData.clear();
@@ -466,7 +476,6 @@ public class Gui {
 	}
 	
 	public class GroupListRenderer extends JLabel implements ListCellRenderer<ModGroup> {
-
 		@Override
 		public Component getListCellRendererComponent(JList<? extends ModGroup> list, ModGroup value, int index,
 				boolean isSelected, boolean cellHasFocus) {
@@ -587,9 +596,45 @@ public class Gui {
 		c.anchor = GridBagConstraints.LINE_END; //bottom of space
 		c.weightx = 1;
 		c.weighty = 1;
-		column2.setBackground(Color.green);
+		
+		JPanel selectAllPane = new JPanel();
+		JCheckBox selectAllCheckBox = new JCheckBox("Select all");  
+		selectAllCheckBox.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){  
+				boolean selectedBool = selectAllCheckBox.isSelected();
+					for(int i = 0; i < model.getRowCount(); i++) {
+						model.setValueAt(selectedBool, i, 3);
+				}
+	        }  
+	    });  
+		selectAllPane.add(selectAllCheckBox);
+		
+		JPanel addRemoveModPane = new JPanel();
+		JButton addModButton = new JButton("Add mod");
+		addModButton.addActionListener(new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+            	
+        	}
+        });
+		JButton removeModButton = new JButton("Remove mod");
+		removeModButton.addActionListener(new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+            	int[] selectedRows = table.getSelectedRows();
+        		listModel.removeModByIndex(groupJList.getMinSelectionIndex(), selectedRows);
+        		model.remove(selectedRows);
+				config.writeModGroupFile(listModel);
+			}
+        });
+		addRemoveModPane.add(addModButton);
+		addRemoveModPane.add(removeModButton);
+		
 		column2.setLayout(new BorderLayout());
+		column2.add(selectAllPane, BorderLayout.PAGE_START);
 		column2.add(tableScrollPane, BorderLayout.CENTER);
+		column2.add(addRemoveModPane, BorderLayout.PAGE_END);
 		groupPanel.add(column2, c);
 		
 		return groupPanel;
@@ -687,7 +732,7 @@ public class Gui {
 				else {
 					ModGroup newGroup = new ModGroup(groupNameInput.getText());
 					for(int i = 0; i < newGroupModel.getRowCount(); i++) {
-						newGroup.addModToList(newGroupModel.getRow(i).getCode());
+						newGroup.add(newGroupModel.getRow(i).getCode());
 					}
 					listModel.add(newGroup);
 					config.writeModGroupFile(listModel);
@@ -846,6 +891,10 @@ public class Gui {
 				break;
 			}
 			return value;
+		}
+		
+		public void repaint() {
+			fireTableDataChanged();
 		}
 	}
 	

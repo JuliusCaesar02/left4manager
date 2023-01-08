@@ -16,36 +16,30 @@ public class ModGroup {
 	
 	public ModGroup(String groupName, int modNumber, List<ModInfo> modList) {
 		this.groupName = groupName;
-		addModToList(modNumber, modList);
+		add(modNumber, modList);
 	}
 	
 	public ModGroup(String groupName, int[] modNumber, List<ModInfo> modList) {
 		this.groupName = groupName;
-		addModToList(modNumber, modList);
+		add(modNumber, modList);
 	}
 	
-	public void addModToList(int index, List<ModInfo> modList) {
+	public void add(int index, List<ModInfo> modList) {
 		this.groupModList.add(modList.get(index).getCode());
 	}
 	
-	public void addModToList(String code) {
+	public void add(String code) {
 		this.groupModList.add(code);
 	}
 	
-	public void addModToList(int[] index, List<ModInfo> modList) {
+	public void add(int[] index, List<ModInfo> modList) {
 		for(int i = 0; i < index.length; i++) {
-			addModToList(index[i], modList);
+			add(index[i], modList);
 		}
 	}
 	
-	public void removeModByList(int listNumber) {
-		this.groupModList.remove(listNumber);
-	}
-	
-	public void removeModByList(int[] modNumber) {
-		for(int i = 0; i < modNumber.length; i++) {
-			removeModByList(modNumber[i]);
-		}
+	public void remove(int index) {
+		this.groupModList.remove(index);
 	}
 	
 	public String getGroupMod(int index){
@@ -62,5 +56,9 @@ public class ModGroup {
 	
 	public List<String> getGroupModList() {
 		return this.groupModList;
+	}
+	
+	public int getSize() {
+		return this.groupModList.size();
 	}
 }
