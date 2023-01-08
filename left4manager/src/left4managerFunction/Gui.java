@@ -61,7 +61,7 @@ public class Gui {
 	Config config = new Config();
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
-	List<ModGroup> groupList = new ArrayList<ModGroup>();
+	GroupListModel listModel = new GroupListModel();
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -443,7 +443,11 @@ public class Gui {
 		public void add(List<ModGroup> data) {
 			int oldLenght = getSize() - 1;
 			rowData.addAll(data);
-			fireIntervalAdded(this, oldLenght, getSize());
+			fireIntervalAdded(this, oldLenght, getSize() - 1);
+		}
+		
+		public List<ModGroup> get(){
+			return rowData;
 		}
 		
 		public void add(ModGroup... pd) {
@@ -459,11 +463,25 @@ public class Gui {
 			rowData.clear();
 			fireIntervalRemoved(this, 0, getSize());
 		}
-		
-		public void refresh(List<ModGroup> data) {
-			rowData.clear();
-			rowData.addAll(data);
-			fireIntervalAdded(this, 0, getSize());
+	}
+	
+	public class GroupListRenderer extends JLabel implements ListCellRenderer<ModGroup> {
+
+		@Override
+		public Component getListCellRendererComponent(JList<? extends ModGroup> list, ModGroup value, int index,
+				boolean isSelected, boolean cellHasFocus) {
+				setText(value.getGroupName());
+				if (isSelected) {
+					setBackground(list.getSelectionBackground());
+					setForeground(list.getSelectionForeground());
+				} else {
+					setBackground(list.getBackground());
+					setForeground(list.getForeground());
+		        }
+				setEnabled(list.isEnabled());
+				setFont(list.getFont());
+				setOpaque(true);
+				return this;
 		}
 	}
 	
@@ -472,17 +490,9 @@ public class Gui {
 		JTable table = new JTable(model);
 
 		int[] array = new int[] {1, 5, 7, 8};
-		groupList.add(new ModGroup("Gruppo1", array, extractModList.getModList()));
-		groupList.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
-		System.out.println(groupList.size());
-		
-		try {
-			writeModGroupFile(groupList);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+		listModel.add(new ModGroup("Gruppo1", array, extractModList.getModList()));
+		listModel.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
+				
 		JPanel groupPanel = new JPanel();
 		
 		groupPanel.setLayout(new GridBagLayout());
@@ -496,47 +506,30 @@ public class Gui {
 		c.weightx = 0.10;
 		c.weighty = 1;
 		
-		GroupListModel listModel = new GroupListModel();
-		listModel.refresh(groupList);
-		
 		JList groupJList = new JList(listModel);
-		
-		ListCellRenderer groupListRenderer = new ListCellRenderer<ModGroup>() {
-			@Override
-			public Component getListCellRendererComponent(JList<? extends ModGroup> list, ModGroup value, int index,
-				boolean isSelected, boolean cellHasFocus) {
-				JLabel label = new JLabel(value.getGroupName());
-				if (isSelected) {
-					label.setBackground(list.getSelectionBackground());
-					label.setForeground(list.getSelectionForeground());
-				} else {
-					label.setBackground(list.getBackground());
-					label.setForeground(list.getForeground());
-		        }
-				label.setEnabled(list.isEnabled());
-				label.setFont(list.getFont());
-				label.setOpaque(true);
-				return label;
-			}
-		};
-
-		groupJList.setCellRenderer(groupListRenderer);
+		groupJList.setCellRenderer(new GroupListRenderer());
 		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 		
 		groupJList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+            	int selectionIndex = groupJList.getMinSelectionIndex();
             	model.clear();
-            	List<ModInfo> newModList = new ArrayList<ModInfo>();
-        		List<ModInfo> modList = extractModList.getModList();
-            	ModGroup selectedGroup = groupList.get(groupJList.getMinSelectionIndex());
-            	for(int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
-            		int index = extractModList.getModIndexByCode(selectedGroup.getGroupMod(i));
-            		if(index != -1) {
-            			newModList.add(modList.get(index));
-            		}
+            	if(selectionIndex < 0) {
+            		selectionIndex = 0;
             	}
-            	model.add(newModList);
+            	if(listModel.getSize() > 0) {
+            		List<ModInfo> newModList = new ArrayList<ModInfo>();
+            		List<ModInfo> modList = extractModList.getModList();
+            		ModGroup selectedGroup = listModel.getElementAt(selectionIndex);
+            		for(int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
+            			int index = extractModList.getModIndexByCode(selectedGroup.getGroupMod(i));
+            			if(index >= 0) {
+            				newModList.add(modList.get(index));
+            			}
+            		}
+            		model.add(newModList);
+            	}
 	        }
 	    });
 		
@@ -563,8 +556,8 @@ public class Gui {
         	@Override
         	public void actionPerformed(ActionEvent e) {
         		if (groupJList.getMinSelectionIndex() >= 0) {
-        			groupList.remove(groupJList.getMinSelectionIndex());
-        			listModel.refresh(groupList);
+        			listModel.remove(groupJList.getMinSelectionIndex());
+        			config.writeModGroupFile(listModel);
         		}
         	}
         });
@@ -617,7 +610,7 @@ public class Gui {
 		groupNamePane.setLayout(new BorderLayout());
 		JLabel groupNameLabel = new JLabel("Group name");
 		JTextField groupNameInput = new JTextField();
-		groupNameInput.setText("Group" +(groupList.size() + 1));
+		groupNameInput.setText("Group" +(listModel.getSize() + 1));
 
 		groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
 		groupNamePane.add(groupNameInput);
@@ -688,12 +681,18 @@ public class Gui {
 		applyButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ModGroup newGroup = new ModGroup(groupNameInput.getText());
-				for(int i = 0; i < newGroupModel.getRowCount(); i++) {
-					newGroup.addModToList(newGroupModel.getRow(i).getCode());
+				if(groupNameInput.getText().equals("")) {
+					JOptionPane.showMessageDialog(addNewGroupFrame, "Mod groups need to be named");
 				}
-				groupList.add(newGroup);
-				addNewGroupFrame.dispose();
+				else {
+					ModGroup newGroup = new ModGroup(groupNameInput.getText());
+					for(int i = 0; i < newGroupModel.getRowCount(); i++) {
+						newGroup.addModToList(newGroupModel.getRow(i).getCode());
+					}
+					listModel.add(newGroup);
+					config.writeModGroupFile(listModel);
+					addNewGroupFrame.dispose();
+				}
 			}
 		});
 		JButton cancelButton = new JButton("Cancel");
@@ -869,19 +868,4 @@ public class Gui {
 		}
 		return groupList;
 	}*/
-	
-	public void writeModGroupFile(List<ModGroup> object) throws FileNotFoundException {
-		config.createFile("modGroup.json");
-		
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();         
-    	FileWriter fw;
-		try {
-			fw = new FileWriter(config.getL4managerDir() +File.separator +"modGroup.json");
-			gson.toJson(object, fw);
-			fw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }
