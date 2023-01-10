@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -115,5 +116,17 @@ public class Config {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public List<ModGroup> readModGroupFile() throws IOException {
+		List<ModGroup> groupList = new ArrayList<ModGroup>();
+		
+    	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
+    	FileReader fr = new FileReader(getL4managerDir() +File.separator +"modGroup.json");
+        Type modGroupListType = new TypeToken<List<ModGroup>>(){}.getType();
+        List<ModGroup> groupListFromJson = gson.fromJson(fr, modGroupListType);
+        fr.close();
+		
+		return groupListFromJson;
 	}
 }

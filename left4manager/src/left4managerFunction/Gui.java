@@ -319,7 +319,7 @@ public class Gui {
 	        	String code = table.getValueAt(table.getSelectedRow(), 1).toString();
 		    	BufferedImage img = null;
 				try {
-					img = ImageIO.read(new File(config.getL4D2Dir() +"left4dead2" +File.separator +"addons" +File.separator +"workshop" +File.separator +code +".jpg"));
+					img = ImageIO.read(new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator +"addons" +File.separator +"workshop" +File.separator +code +".jpg"));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -442,6 +442,9 @@ public class Gui {
 		
 		public void add(List<ModGroup> data) {
 			int oldLenght = getSize() - 1;
+			if(oldLenght < 0) {
+				oldLenght = 0;
+			}
 			rowData.addAll(data);
 			fireIntervalAdded(this, oldLenght, getSize() - 1);
 		}
@@ -497,10 +500,13 @@ public class Gui {
 	public JPanel createGroupTab() {
 		GroupModTableModel model = new GroupModTableModel(); 
 		JTable table = new JTable(model);
-
-		int[] array = new int[] {1, 5, 7, 8};
-		listModel.add(new ModGroup("Gruppo1", array, extractModList.getModList()));
-		listModel.add(new ModGroup("Gruppo2", 2, extractModList.getModList()));
+		
+		try {
+			listModel.add(config.readModGroupFile());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 				
 		JPanel groupPanel = new JPanel();
 		
@@ -524,12 +530,13 @@ public class Gui {
             public void valueChanged(ListSelectionEvent e) {
             	int selectionIndex = groupJList.getMinSelectionIndex();
             	model.clear();
-            	if(selectionIndex < 0) {
+            	if(selectionIndex < 0 || selectionIndex > listModel.getSize() - 1) {
             		selectionIndex = 0;
             	}
             	if(listModel.getSize() > 0) {
             		List<ModInfo> newModList = new ArrayList<ModInfo>();
             		List<ModInfo> modList = extractModList.getModList();
+            		System.out.println(selectionIndex);
             		ModGroup selectedGroup = listModel.getElementAt(selectionIndex);
             		for(int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
             			int index = extractModList.getModIndexByCode(selectedGroup.getGroupMod(i));
@@ -556,7 +563,7 @@ public class Gui {
         	
         	@Override
         	public void actionPerformed(ActionEvent e) {
-        		addNewGroupPopUp();
+        		addNewGroupPopUp(-2);
         	}
         });
         
@@ -564,16 +571,18 @@ public class Gui {
         removeGroup.addActionListener(new ActionListener() {
         	@Override
         	public void actionPerformed(ActionEvent e) {
-        		if (groupJList.getMinSelectionIndex() >= 0) {
-        			listModel.remove(groupJList.getMinSelectionIndex());
+        		int index = groupJList.getMinSelectionIndex();
+        		if (index >= 0) {
+        			listModel.remove(index);
+        			if(index > 0) {
+        				groupJList.setSelectedIndex(index);
+        			}
         			config.writeModGroupFile(listModel);
         		}
         	}
         });
         
         buttonPanel.add(addGroup, BorderLayout.LINE_START);
-        
-        
         buttonPanel.add(removeGroup, BorderLayout.LINE_END);
         column.add(buttonPanel, BorderLayout.PAGE_END);
         
@@ -615,7 +624,9 @@ public class Gui {
 		addModButton.addActionListener(new ActionListener() {
         	@Override
         	public void actionPerformed(ActionEvent e) {
-            	
+        		if(groupJList.getMinSelectionIndex() >= 0) {
+        			addNewGroupPopUp(groupJList.getMinSelectionIndex());
+        		}
         	}
         });
 		JButton removeModButton = new JButton("Remove mod");
@@ -623,9 +634,11 @@ public class Gui {
         	@Override
         	public void actionPerformed(ActionEvent e) {
             	int[] selectedRows = table.getSelectedRows();
-        		listModel.removeModByIndex(groupJList.getMinSelectionIndex(), selectedRows);
-        		model.remove(selectedRows);
-				config.writeModGroupFile(listModel);
+            	if(selectedRows.length > 0) {
+            		listModel.removeModByIndex(groupJList.getMinSelectionIndex(), selectedRows);
+            		model.remove(selectedRows);
+            		config.writeModGroupFile(listModel);
+            	}
 			}
         });
 		addRemoveModPane.add(addModButton);
@@ -640,7 +653,7 @@ public class Gui {
 		return groupPanel;
 	}
 	
-	public void addNewGroupPopUp() {
+	public void addNewGroupPopUp(int selectedIndex) {
 		GroupModTableModel allModModel = new GroupModTableModel(1); 
 		GroupModTableModel newGroupModel = new GroupModTableModel(1); 
 		
@@ -657,8 +670,18 @@ public class Gui {
 		JTextField groupNameInput = new JTextField();
 		groupNameInput.setText("Group" +(listModel.getSize() + 1));
 
-		groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
-		groupNamePane.add(groupNameInput);
+		if(selectedIndex != -2) {
+			addNewGroupFrame.setTitle("Modify group");
+			groupNameLabel.setText(listModel.getElementAt(selectedIndex).getGroupName());
+			groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
+			for(int i = 0; i < listModel.getElementAt(selectedIndex).getSize(); i++) {
+				newGroupModel.add(extractModList.getModInfoByCode(listModel.getElementAt(selectedIndex).getGroupMod(i)));
+			}
+		}
+		else {
+			groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
+			groupNamePane.add(groupNameInput);
+		}
 		
 		JPanel tablePane = new JPanel();
 		tablePane.setLayout(new BoxLayout(tablePane, BoxLayout.LINE_AXIS));
@@ -730,7 +753,12 @@ public class Gui {
 					JOptionPane.showMessageDialog(addNewGroupFrame, "Mod groups need to be named");
 				}
 				else {
-					ModGroup newGroup = new ModGroup(groupNameInput.getText());
+					String groupName = groupNameInput.getText();
+					if(selectedIndex != -2) {
+						groupName = listModel.getElementAt(selectedIndex).getGroupName();
+						listModel.remove(selectedIndex);
+					}
+					ModGroup newGroup = new ModGroup(groupName);
 					for(int i = 0; i < newGroupModel.getRowCount(); i++) {
 						newGroup.add(newGroupModel.getRow(i).getCode());
 					}
@@ -740,6 +768,7 @@ public class Gui {
 				}
 			}
 		});
+
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
