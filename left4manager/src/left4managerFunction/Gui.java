@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javax.swing.table.*;
+import javax.swing.text.BadLocationException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -296,9 +297,16 @@ public class Gui {
 		leftPane.add(new JScrollPane(table));
 		
 		JPanel rightPane = new JPanel(); 
+		rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
 		JPanel descriptionPane = new JPanel(); 
-		descriptionPane.add(imgLabel);
+		descriptionPane.setLayout(new BoxLayout(descriptionPane, BoxLayout.PAGE_AXIS));
+		//descriptionPane.add(imgLabel);
+		textDescription.setEditable(false);
+		textDescription.setContentType("text/html");
+		textDescription.setFont(new Font("MS Song", Font.PLAIN, 14));
+		
 		descriptionPane.add(textDescription);	
+		descriptionPane.add(imgLabel);
 		rightPane.setBackground(Color.red);
 		JButton saveButton = new JButton("Save");
 		rightPane.add(new JScrollPane(descriptionPane));
@@ -320,14 +328,12 @@ public class Gui {
 		    	BufferedImage img = null;
 				try {
 					img = ImageIO.read(new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator +"addons" +File.separator +"workshop" +File.separator +code +".jpg"));
+					textDescription.setText(extractModList.getModInfoByCode(code).getDescription());
+					imgLabel.setIcon(new ImageIcon(img));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				imgLabel.setIcon(new ImageIcon(img));
-				//imgLabel.setIcon(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_DEFAULT)));
-				//textDescription.setText(extractModList.getModList().get(table.getSelectedRow()).getDescription());
-				textDescription.setEditable(false);
 			}
 		});
 			
@@ -653,6 +659,10 @@ public class Gui {
 		return groupPanel;
 	}
 	
+	/***
+	 * Create a popup to either add or modify the mods in a mod group
+	 * @param selectedIndex -1: add new group, > 1: index of the ModGroup listModel to modify
+	 */
 	public void addNewGroupPopUp(int selectedIndex) {
 		GroupModTableModel allModModel = new GroupModTableModel(1); 
 		GroupModTableModel newGroupModel = new GroupModTableModel(1); 
@@ -834,8 +844,8 @@ public class Gui {
 			}
         }
 		
-		public void add(List<ModInfo> mods) {
-			rowData.addAll(mods);
+		public void add(List<ModInfo> modList) {
+			rowData.addAll(modList);
 			fireTableDataChanged();
 		}
 		
