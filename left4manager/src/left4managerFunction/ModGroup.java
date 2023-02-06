@@ -41,6 +41,13 @@ public class ModGroup {
 	public void remove(int index) {
 		this.groupModList.remove(index);
 	}
+	public void remove(String code) {
+		for(int i = 0; i < this.getSize(); i++) {
+			if(this.getGroupMod(i).equals(code)) {
+				this.remove(i);		
+			}
+		}
+	}
 	
 	public String getGroupMod(int index){
 		return this.groupModList.get(index);

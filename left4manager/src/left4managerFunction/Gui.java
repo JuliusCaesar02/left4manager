@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -50,6 +51,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
@@ -290,6 +293,91 @@ public class Gui {
 		model.add(extractModList.getModList());
 		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(model);
 		JTable table = new JTable(model);
+		
+        JPopupMenu tablePopupMenu = new JPopupMenu();
+        tablePopupMenu.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            	JMenu addToGroupButton = new JMenu("Add to group");
+            	JMenu removeFromGroupButton = new JMenu("Remove from group");
+            	JMenuItem refreshInfoesButton = new JMenuItem("Refresh info");
+            	
+            	
+            	tablePopupMenu.add(addToGroupButton);
+            	tablePopupMenu.add(removeFromGroupButton);
+            	tablePopupMenu.add(refreshInfoesButton);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = table.rowAtPoint(SwingUtilities.convertPoint(tablePopupMenu, new Point(0, 0), table));
+                        if (rowAtPoint > -1) {
+                            table.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                            String selectedModCode = table.getValueAt(table.getSelectedRow(), 1).toString();
+                            refreshInfoesButton.addActionListener(new ActionListener(){  
+                            	public void actionPerformed(ActionEvent e){  
+                            		String[] additionalInfo = extractModList.getAdditionalInfo(selectedModCode);
+                            		int modIndex = extractModList.getModIndexByCode(selectedModCode);
+                            		extractModList.getModList().get(modIndex).setName(additionalInfo[0]);
+                            		extractModList.getModList().get(modIndex).setAuthor(additionalInfo[1]);
+                            		extractModList.getModList().get(modIndex).setDescription(additionalInfo[2]);
+                            	}  
+                            });  
+                            JMenuItem newGroupItem = new JMenuItem("New group");
+                            newGroupItem.addActionListener(new ActionListener(){  
+                    			public void actionPerformed(ActionEvent e){  
+                    				addNewGroupPopUp(-2);
+                    				tablePopupMenu.removeAll();
+                    	        }  
+                    	    });  
+                            addToGroupButton.add(newGroupItem);
+                            addToGroupButton.addSeparator();
+                            for(int i = 0; i < listModel.getSize(); i++) {
+                            	boolean exist = false;
+                            	for(int j = 0; j < listModel.getElementAt(i).getSize(); j++) {
+                            		if(listModel.getElementAt(i).getGroupMod(j).equals(selectedModCode)) {
+                                		final int index = i;
+                                		System.out.println("ciao");
+
+                                		JMenuItem removeFromGroupItem = new JMenuItem(listModel.getElementAt(i).getGroupName());
+                                		removeFromGroupItem.addActionListener(new ActionListener(){  
+                                			public void actionPerformed(ActionEvent e){  
+                                				listModel.getElementAt(index).remove(selectedModCode);
+                                        		config.writeModGroupFile(listModel);
+                                	        }  
+                                	    });  
+                            			removeFromGroupButton.add(removeFromGroupItem);
+                            			exist = true;
+                            		}
+                            	}
+                            	if(!exist) {
+                            		final int index = i;
+                            		JMenuItem addToGroupItem = new JMenuItem(listModel.getElementAt(i).getGroupName());
+                            		addToGroupItem.addActionListener(new ActionListener(){  
+                            			public void actionPerformed(ActionEvent e){  
+                            				listModel.getElementAt(index).add(selectedModCode);
+                                    		config.writeModGroupFile(listModel);
+                            	        }  
+                            	    });  
+                            		addToGroupButton.add(addToGroupItem);
+                            	}
+                            }
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            	tablePopupMenu.removeAll();
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            	tablePopupMenu.removeAll();
+            }
+        });
+        
+        table.setComponentPopupMenu(tablePopupMenu);
 		table.setShowGrid(false);
 		table.setShowHorizontalLines(true);
 		table.setRowSorter(sorter);
@@ -661,7 +749,7 @@ public class Gui {
 	
 	/***
 	 * Create a popup to either add or modify the mods in a mod group
-	 * @param selectedIndex -1: add new group, > 1: index of the ModGroup listModel to modify
+	 * @param selectedIndex -2: add new group, > 1: index of the ModGroup listModel to modify
 	 */
 	public void addNewGroupPopUp(int selectedIndex) {
 		GroupModTableModel allModModel = new GroupModTableModel(1); 

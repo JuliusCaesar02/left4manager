@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -98,7 +99,7 @@ public class ExtractModList {
     	
     	try {
     		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
-			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName));
+			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName), Charset.forName("UTF-8"));
 			System.out.println("Is json file empty?" +checkIfEmpty());
 	    	if(!checkIfEmpty()) {
 	    		content.forEach(i->{
@@ -188,7 +189,7 @@ public class ExtractModList {
     	  connection =  new URL(url).openConnection();
     	  InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
     	  Scanner scanner = new Scanner(reader);
-    	  scanner.useDelimiter("<div class=\"detailBox\">");
+    	  scanner.useDelimiter("<div class=\"detailBox\"><script type=\"text/javascript\">");
     	  html = scanner.next();
     	  scanner.close();
     	} catch (IOException e) {
@@ -204,7 +205,7 @@ public class ExtractModList {
     	result[1] = regexParser(authorRegex, html);
     	//System.out.println(regexParser(authorRegex, html));
     	
-    	Pattern descriptionRegex = Pattern.compile("<div class=\"workshopItemDescription\" id=\"highlightContent\">(.*?)</div>");
+    	Pattern descriptionRegex = Pattern.compile("<div class=\"workshopItemDescription\" id=\"highlightContent\">(.+?)<script>", Pattern.DOTALL);
     	//System.out.println(regexParser(descriptionRegex, html));
     	result[2] = regexParser(descriptionRegex, html);
     	
