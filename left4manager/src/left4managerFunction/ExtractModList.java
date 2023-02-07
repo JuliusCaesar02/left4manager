@@ -100,7 +100,6 @@ public class ExtractModList {
     	try {
     		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
 			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName), Charset.forName("UTF-8"));
-			System.out.println("Is json file empty?" +checkIfEmpty());
 	    	if(!checkIfEmpty()) {
 	    		content.forEach(i->{
 	    			System.out.println(i);
@@ -114,16 +113,19 @@ public class ExtractModList {
 				         ModInfo objectFromJson = new ModInfo("NULL", false);
 						 try {
 							 objectFromJson = getObjectFromJson(checkedLine.group(1));
+							 System.out.println(objectFromJson.getName());
 						 } catch (Exception e) {
 							 // TODO Auto-generated catch block
 							 e.printStackTrace();
 						 }
 				         if(objectFromJson.getCode() == "NULL") {
 				        	 System.out.println("Object not found in json");
-				        	 String[] additionalInfo = getAdditionalInfo(checkedLine.group(1));
-					         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+				        	 String html = getHtml(checkedLine.group(1));
+				        	 String[] additionalInfo = getAdditionalInfo(html);
+				        	 List<Tags> tags = getTags(html);
+					         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], tags, enabled));
 					         try {
-								addObjectToJson(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+								addObjectToJson(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], tags, enabled));
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -138,17 +140,19 @@ public class ExtractModList {
 				});
 	    	}
 	    	else {
+	    		System.out.println("Empty file, adding the entire list to json at the end of the operation");
 	    		content.forEach(i->{
 	    			System.out.println(i);
 	    			Matcher checkedLine = pattern.matcher(i);
 	    			if (checkedLine.find()) {
-	    				System.out.println("Empty file, adding the entire list to json at the end of the operation");
 	    				boolean enabled = false;
 				         if(checkedLine.group(2).equals("1")) {
 				        	 enabled = true;
 				         }
-				         String[] additionalInfo = getAdditionalInfo(checkedLine.group(1));
-				         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
+			        	 String html = getHtml(checkedLine.group(1));
+				         String[] additionalInfo = getAdditionalInfo(html);
+				         List<Tags> tags = getTags(html);
+				         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], tags, enabled));
 	    			}  
 	    		});
 	    		try {
@@ -180,22 +184,27 @@ public class ExtractModList {
     	modList.add(position, modList.remove(elementIndex));
     }
     
-    public String[] getAdditionalInfo(String code) {
-    	String[] result = new String[3];
+    public String getHtml(String code) {
     	String html = null;
     	String url = "https://steamcommunity.com/sharedfiles/filedetails/?id=" +code;
     	URLConnection connection = null;
+
     	try {
-    	  connection =  new URL(url).openConnection();
-    	  InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
-    	  Scanner scanner = new Scanner(reader);
-    	  scanner.useDelimiter("<div class=\"detailBox\"><script type=\"text/javascript\">");
-    	  html = scanner.next();
-    	  scanner.close();
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    	}
+      	  connection =  new URL(url).openConnection();
+      	  InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
+      	  Scanner scanner = new Scanner(reader);
+      	  scanner.useDelimiter("<div class=\"detailBox\"><script type=\"text/javascript\">");
+      	  html = scanner.next();
+      	  scanner.close();
+      	} catch (IOException e) {
+      		e.printStackTrace();
+      	}
     	//System.out.println(html);
+    	return html;
+    }
+    
+    public String[] getAdditionalInfo(String html) {
+    	String[] result = new String[3];
     	
 		Pattern titleRegex = Pattern.compile("<div class=\"workshopItemTitle\">(.*?)\\n*</div>");
     	//System.out.println(regexParser(titleRegex, html));
@@ -208,8 +217,37 @@ public class ExtractModList {
     	Pattern descriptionRegex = Pattern.compile("<div class=\"workshopItemDescription\" id=\"highlightContent\">(.+?)<script>", Pattern.DOTALL);
     	//System.out.println(regexParser(descriptionRegex, html));
     	result[2] = regexParser(descriptionRegex, html);
-    	
+    		
     	return result;
+    }
+    
+    public List<Tags> getTags(String html){  	
+    	List<Tags> tags = new ArrayList<Tags>();   
+    	Pattern bigCutRegex = Pattern.compile("<div class=\"col_right responsive_local_menu\">([\\s\\S]*?)<div class=\"detailsStatsContainerLeft\">", Pattern.DOTALL);
+    	String bigCutString = regexParser(bigCutRegex, html);	
+    	//System.out.println(bigCutString);
+    	
+    	Pattern tagGroupRegex = Pattern.compile("<div data-panel=[\\s\\S]*?class=\"workshopTags\">([\\s\\S]*?)<\\/div>", Pattern.DOTALL);
+    	Matcher tagGroupMatcher = tagGroupRegex.matcher(bigCutString);
+    	
+    	while (tagGroupMatcher.find()) {
+    		//System.out.println(tagGroupMatcher.group(i) +i +"/" +tagGroupMatcher.groupCount());
+			String tagGroupString = tagGroupMatcher.group();
+    		
+			Pattern primaryTagRegex = Pattern.compile("<span class=\"workshopTagsTitle\">([\\s\\S]*?):&nbsp;", Pattern.DOTALL);
+	    	String primaryTagsString = regexParser(primaryTagRegex, tagGroupString);
+	    	
+			List<String> secondaryTags = new ArrayList<String>();   
+			Pattern secondaryTagRegex = Pattern.compile("<a[\\s\\S]*?>([\\s\\S]*?)<\\/a>", Pattern.DOTALL);
+	    	Matcher secondaryTagsMatcher = secondaryTagRegex.matcher(tagGroupString);
+	    	//System.out.println(regexParser(secondaryTagRegex, bigCutString));
+	    	
+	    	while (secondaryTagsMatcher.find()) { 		
+	    		secondaryTags.add(secondaryTagsMatcher.group(1));
+	    	}
+			tags.add(new Tags(primaryTagsString, secondaryTags));
+    	}
+    	return tags;
     }
     
     /******

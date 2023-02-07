@@ -336,7 +336,6 @@ public class Gui {
                             	for(int j = 0; j < listModel.getElementAt(i).getSize(); j++) {
                             		if(listModel.getElementAt(i).getGroupMod(j).equals(selectedModCode)) {
                                 		final int index = i;
-                                		System.out.println("ciao");
 
                                 		JMenuItem removeFromGroupItem = new JMenuItem(listModel.getElementAt(i).getGroupName());
                                 		removeFromGroupItem.addActionListener(new ActionListener(){  
