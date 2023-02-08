@@ -65,6 +65,7 @@ public class Gui {
 	Config config = new Config();
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
+	AllTags allTags;
 	GroupListModel listModel = new GroupListModel();
 
 	public static void main(String[] args) {
@@ -243,6 +244,7 @@ public class Gui {
 	private void initialize() {		
 		extractModList = new ExtractModList(config);
 		updateModFile = new UpdateModFile(config);
+		allTags = new AllTags(config);
 		
 		try {
 			extractModList.populateModList();
@@ -267,13 +269,14 @@ public class Gui {
 		JPanel tab1 = new JPanel();  
 	    JPanel tab2 = new JPanel();  
 	    JPanel tab3 = new JPanel();  
-	    JPanel tab4 = new JPanel();
+	    JPanel tab5 = new JPanel();
 	    JTabbedPane tabbedPane = new JTabbedPane();  
 	    tabbedPane.setBounds(50,50,200,200);  
 	    tabbedPane.add("List", createListTab());  
 	    tabbedPane.add("Group", createGroupTab());  
 	    tabbedPane.add("Order", createOrderTab());
-	    tabbedPane.add("Options", tab4);
+	    tabbedPane.add("Tag", createTagTab());
+	    tabbedPane.add("Options", tab5);
 		return tabbedPane;
 	}
 	
@@ -281,17 +284,32 @@ public class Gui {
 		JPanel listPane = new JPanel(); 
 		listPane.setBackground(Color.cyan);
 		listPane.setLayout(new GridLayout(0, 2));
+		
 		JCheckBox selectAll = new JCheckBox("Select all");  
 		selectAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		
-		JPanel leftPane = new JPanel(); 
-		leftPane.setBackground(Color.green);
-		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
-		leftPane.add(selectAll);
 		
 		GroupModTableModel model = new GroupModTableModel();
 		model.add(extractModList.getModList());
 		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(model);
+		JTextField searchFilterText = new JTextField("sium");
+		searchFilterText.setMaximumSize(new Dimension(1000, 50));
+		JButton searchButton = new JButton("Filter");
+		searchButton.addActionListener(new ActionListener(){  
+			public void actionPerformed(ActionEvent e){  
+				sorter.setRowFilter(searchFilter(searchFilterText.getText()));
+			}  
+		});  
+		
+		JPanel leftPane = new JPanel(); 
+		JPanel upperPane = new JPanel();
+		upperPane.setLayout(new BoxLayout(upperPane, BoxLayout.LINE_AXIS));
+		leftPane.setBackground(Color.green);
+		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
+		upperPane.add(searchFilterText);
+		upperPane.add(searchButton);
+		upperPane.add(selectAll);
+		leftPane.add(upperPane);
 		JTable table = new JTable(model);
 		
         JPopupMenu tablePopupMenu = new JPopupMenu();
@@ -433,6 +451,12 @@ public class Gui {
 		listPane.add(leftPane);
 		listPane.add(rightPane);
 		return listPane;
+	}
+	
+	private RowFilter<GroupModTableModel, Object> searchFilter(String text) {
+	    RowFilter<GroupModTableModel, Object> rf = null;
+	    rf = RowFilter.regexFilter("(?i)" + text);
+	    return rf;
 	}
 	
 	
@@ -1022,6 +1046,51 @@ public class Gui {
 		public void repaint() {
 			fireTableDataChanged();
 		}
+	}
+	
+	public JPanel createTagTab() {
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BorderLayout());
+		
+		JPanel boxLayoutPanel = new JPanel();
+		List<Tags> allTagsList = new ArrayList<Tags>();
+		allTagsList = allTags.getAllTags();
+		
+		boxLayoutPanel.setLayout(new BoxLayout(boxLayoutPanel, BoxLayout.PAGE_AXIS));
+		boxLayoutPanel.setBackground(Color.orange);
+		boxLayoutPanel.add(createCollapsable("test", Color.red));
+		boxLayoutPanel.add(createCollapsable("test", Color.green));
+		boxLayoutPanel.add(createCollapsable("test", Color.black));
+		
+		mainPanel.add(boxLayoutPanel, BorderLayout.PAGE_START);
+		return mainPanel;
+	
+	}
+	
+	public JPanel  createCollapsable(String title, Color color) {
+		JPanel collapsablePanel = new JPanel();
+		collapsablePanel.setLayout(new BorderLayout());
+		collapsablePanel.setBackground(color);
+		
+		JPanel content = new JPanel();
+		content.add(new JLabel("test"));
+		
+		JPanel header = new JPanel();
+		JLabel headerLabel = new JLabel("title");
+		JButton headerButton = new JButton();
+		headerButton.addActionListener(new ActionListener() {
+			@Override
+        	public void actionPerformed(ActionEvent e) {
+            	content.setVisible(!content.isVisible());
+			}
+		});
+		header.setBackground(color);
+		header.add(headerLabel);
+		header.add(headerButton);
+		
+		collapsablePanel.add(header, BorderLayout.PAGE_START);
+		collapsablePanel.add(content, BorderLayout.CENTER);
+		return collapsablePanel;
 	}
 	
 	/*public List<ModGroup> readModGroupFile() {
