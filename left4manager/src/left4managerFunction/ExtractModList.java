@@ -3,15 +3,20 @@ package left4managerFunction;
 import java.util.*;
 import java.lang.reflect.Type;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -100,7 +105,7 @@ public class ExtractModList {
     	
     	try {
     		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
-			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName), Charset.forName("UTF-8"));
+			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName), StandardCharsets.UTF_8);
 	    	if(!checkIfEmpty()) {
 	    		content.forEach(i->{
 	    			System.out.println(i);
@@ -286,7 +291,7 @@ public class ExtractModList {
      */
     public void addObjectToJson(List<ModInfo> objectList) throws Exception {
     	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 	
-    	FileWriter fw = new FileWriter(jsonFile);
+    	BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(jsonFile, true), StandardCharsets.UTF_8));
     	gson.toJson(objectList, fw);
 		fw.close();
     }
@@ -313,7 +318,7 @@ public class ExtractModList {
 	        }
 	        
 	        if(!exist) {    	  	
-        		FileWriter fw = new FileWriter(jsonFile);
+	        	BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(jsonFile, true), StandardCharsets.UTF_8));
         		oldJson.add(object);
         		gson.toJson(oldJson, fw);
         		fw.close();   			
