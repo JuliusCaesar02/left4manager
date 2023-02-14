@@ -36,3 +36,4 @@ public class Tags {
 		this.secondaryTag.add(tag);
 	}
 }
+

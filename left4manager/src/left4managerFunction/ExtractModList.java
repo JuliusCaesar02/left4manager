@@ -35,7 +35,7 @@ public class ExtractModList {
     
 	public ExtractModList(Config config) {
 		this.addonsPath = config.getL4D2Dir() +File.separator +"left4dead2" +File.separator;
-		this.jsonFile = config.getL4managerDir() +File.separator +"modJson.json";
+		this.jsonFile = config.getL4managerDir() +File.separator +"json" +File.separator +"modJson.json";
 		this.fileName = config.getAddonsFileName();
 	}
     public List<ModInfo> getModList() {

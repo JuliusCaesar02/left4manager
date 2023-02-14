@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import left4managerFunction.Gui.GroupListModel;
 
 public class Config {
 	private String l4d2Dir = new String();
-	final private String l4managerDir = new String(System.getProperty("user.home") +File.separator +".left4manager");
+	final private String l4managerDir = new String(System.getProperty("user.dir"));
 	final private String addonsFileName = new String("addonlist.txt");
 
 	/************
@@ -34,7 +35,6 @@ public class Config {
 	}
 	
 	public Config() {
-		readFile();
 	}
 	
 	public void setL4D2Dir(String dir) {
@@ -52,7 +52,7 @@ public class Config {
 	
 	public void createFile(String name) {
 		try {
-		    File myObj = new File(this.l4managerDir +File.separator + name);
+		    File myObj = new File(this.l4managerDir +File.separator +"json" +File.separator + name);
 		    if (myObj.createNewFile()) {
 		      System.out.println("File created: " + myObj.getName());
 		    } else {
@@ -64,10 +64,18 @@ public class Config {
 	    }
 	}
 	
+	public void createFolder() {
+		File file = new File(l4managerDir);
+		if(file.mkdir()){
+			System.out.println("sium");
+		}
+		else System.out.println("gnomo");
+		}
+	
 	public void writeFile() {
 		createFile("config.txt");
 		try {
-			FileWriter fw = new FileWriter(this.l4managerDir +File.separator + "config.txt");
+			FileWriter fw = new FileWriter(this.l4managerDir +File.separator +"json" +File.separator + "config.txt");
 			fw.write(buildString());
 			fw.close();
 			//System.out.println(output);
@@ -78,22 +86,16 @@ public class Config {
 		}
 	}
 	
-	public void readFile() {
-		try {
-			List<String> content = Files.readAllLines(Paths.get(this.l4managerDir +File.separator + "config.txt"));
-			Pattern l4d2DirPattern = Pattern.compile("\"l4d2Dir\":\\s*\"(.*?)\"");
-			
-			for(int i = 0; i < content.size(); i++) {
-				Matcher l4d2DirMatcher = l4d2DirPattern.matcher(content.get(i));
-
-				if(l4d2DirMatcher.find()) {
-					this.l4d2Dir = l4d2DirMatcher.group(1);
-				}			
-			}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public void readFile() throws IOException {
+		List<String> content = Files.readAllLines(Paths.get(this.l4managerDir +File.separator +"json" +File.separator + "config.txt"));
+		Pattern l4d2DirPattern = Pattern.compile("\"l4d2Dir\":\\s*\"(.*?)\"");
+		
+		for(int i = 0; i < content.size(); i++) {
+			Matcher l4d2DirMatcher = l4d2DirPattern.matcher(content.get(i));
+	
+			if(l4d2DirMatcher.find()) {
+				this.l4d2Dir = l4d2DirMatcher.group(1);
+			}			
 		}
 	}
 	
@@ -109,7 +111,7 @@ public class Config {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();         
     	FileWriter fw;
 		try {
-			fw = new FileWriter(getL4managerDir() +File.separator +"modGroup.json");
+			fw = new FileWriter(getL4managerDir() +File.separator +"json" +File.separator +"modGroup.json");
 			gson.toJson(listModel.get(), fw);
 			fw.close();
 		} catch (IOException e) {
@@ -119,10 +121,11 @@ public class Config {
 	}
 	
 	public List<ModGroup> readModGroupFile() throws IOException {
+		createFile("modGroup.json");
 		List<ModGroup> groupList = new ArrayList<ModGroup>();
 		
     	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
-    	FileReader fr = new FileReader(getL4managerDir() +File.separator +"modGroup.json");
+    	FileReader fr = new FileReader(getL4managerDir() +File.separator +"json" +File.separator +"modGroup.json");
         Type modGroupListType = new TypeToken<List<ModGroup>>(){}.getType();
         List<ModGroup> groupListFromJson = gson.fromJson(fr, modGroupListType);
         fr.close();

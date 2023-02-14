@@ -14,7 +14,7 @@ public class AllTags {
 	private String allTagsPath = new String();
 
 	public AllTags(Config config) {
-		this.allTagsPath = config.getL4managerDir() +File.separator +"allTags.json";
+		this.allTagsPath = config.getL4managerDir() +File.separator +"json" +File.separator +"allTags.json";
 		try {
 			extractAllTags();
 		} catch (IOException e) {
