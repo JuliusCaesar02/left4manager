@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -21,6 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JProgressBar;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,118 +65,30 @@ public class ExtractModList {
 		return -1;
     }
     
-    
-    /*public void populateModList() throws Exception {
-    	createJsonFile();
+    public List<ModInfo> readL4d2ModList() throws IOException{
+    	List<ModInfo> l4d2ModList = new ArrayList<ModInfo>();
     	
-    	try {
-    		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
-			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName));
-			content.forEach(i->{
-				System.out.println(i);
-				Matcher checkedLine = pattern.matcher(i);
-				if (checkedLine.find()) {
-			         boolean enabled = false;
-			         if(checkedLine.group(2).equals("1")) {
-			        	 enabled = true;
-			         }
-			         String[] additionalInfo = getAdditionalInfo(checkedLine.group(1));
-			         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
-			         
-			         if(checkIfEmpty()) {
-			        	 try {
-			        		 addObjectToJson(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], enabled));
-			        	 } catch (Exception e) {
-			        		 // TODO Auto-generated catch block
-			        		 e.printStackTrace();
-			        	 }
-			         } else {
-						 try {
-							 addObjectToJson(modList);
-						 } catch (Exception e) {
-							 // TODO Auto-generated catch block
-							 e.printStackTrace();
-						 }
-			         }
-			    }
-			});
-		} catch (IOException e) {
-			File file = new File(addonsPath +fileName);
-		}
-    }*/
-    
-    public void populateModList() {
-    	createJsonFile();
+		BufferedReader fr = new BufferedReader(new InputStreamReader(new FileInputStream(addonsPath +fileName)));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = fr.readLine()) != null) {
+            sb.append(line);
+        }
+        String fileText = sb.toString();
+
+        Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
+        Matcher matcher = pattern.matcher(fileText);
+        while (matcher.find()) {
+        	boolean isEnabled = false;
+        	if(matcher.group(2).equals("1")) {
+        		isEnabled = true;
+        	}
+        	System.out.println(matcher.group(1) + isEnabled);
+        	l4d2ModList.add(new ModInfo(matcher.group(1), isEnabled));
+        }
+    	fr.close();
     	
-    	try {
-    		Pattern pattern = Pattern.compile("(\\d+).vpk\"\\s*\"(\\d*)");
-			List<String> content = Files.readAllLines(Paths.get(addonsPath +fileName), StandardCharsets.UTF_8);
-	    	if(!checkIfEmpty()) {
-	    		content.forEach(i->{
-	    			System.out.println(i);
-	    			Matcher checkedLine = pattern.matcher(i);
-	    			if (checkedLine.find()) {
-	    				boolean enabled = false;
-				         if(checkedLine.group(2).equals("1")) {
-				        	 enabled = true;
-				         }
-				         
-				         ModInfo objectFromJson = new ModInfo("NULL", false);
-						 try {
-							 objectFromJson = getObjectFromJson(checkedLine.group(1));
-							 System.out.println(objectFromJson.getName());
-						 } catch (Exception e) {
-							 // TODO Auto-generated catch block
-							 e.printStackTrace();
-						 }
-				         if(objectFromJson.getCode() == "NULL") {
-				        	 System.out.println("Object not found in json");
-				        	 String html = getHtml(checkedLine.group(1));
-				        	 String[] additionalInfo = getAdditionalInfo(html);
-				        	 List<Tags> tags = getTags(html);
-					         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], tags, enabled));
-					         try {
-								addObjectToJson(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], tags, enabled));
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-				         }
-				         else {
-				        	 System.out.println("Object found in json");
-				        	 modList.add(objectFromJson);
-				        	 modList.get(modList.size() - 1).setEnabled(enabled);
-				         }
-	    			}
-				});
-	    	}
-	    	else {
-	    		System.out.println("Empty file, adding the entire list to json at the end of the operation");
-	    		content.forEach(i->{
-	    			System.out.println(i);
-	    			Matcher checkedLine = pattern.matcher(i);
-	    			if (checkedLine.find()) {
-	    				boolean enabled = false;
-				         if(checkedLine.group(2).equals("1")) {
-				        	 enabled = true;
-				         }
-			        	 String html = getHtml(checkedLine.group(1));
-				         String[] additionalInfo = getAdditionalInfo(html);
-				         List<Tags> tags = getTags(html);
-				         modList.add(new ModInfo(additionalInfo[0], checkedLine.group(1), additionalInfo[1], additionalInfo[2], tags, enabled));
-	    			}  
-	    		});
-	    		try {
-	    			addObjectToJson(modList);
-	    		} catch (Exception e) {
-	    			// TODO Auto-generated catch block
-	    			e.printStackTrace();
-	    		}
-	    	}
-    	} catch(IOException e) {
-    		e.printStackTrace();
-    	}
-    	
+    	return l4d2ModList;
     }
     
     public void swapPosition(int first, int second) {
@@ -190,21 +107,18 @@ public class ExtractModList {
     	modList.add(position, modList.remove(elementIndex));
     }
     
-    public String getHtml(String code) {
+    public String getHtml(String code) throws IOException {
     	String html = null;
     	String url = "https://steamcommunity.com/sharedfiles/filedetails/?id=" +code;
     	URLConnection connection = null;
 
-    	try {
-      	  connection =  new URL(url).openConnection();
-      	  InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
-      	  Scanner scanner = new Scanner(reader);
-      	  scanner.useDelimiter("<div class=\"detailBox\"><script type=\"text/javascript\">");
-      	  html = scanner.next();
-      	  scanner.close();
-      	} catch (IOException e) {
-      		e.printStackTrace();
-      	}
+  	  connection =  new URL(url).openConnection();
+  	  InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
+  	  Scanner scanner = new Scanner(reader);
+  	  scanner.useDelimiter("<div class=\"detailBox\"><script type=\"text/javascript\">");
+  	  html = scanner.next();
+  	  scanner.close();
+
     	//System.out.println(html);
     	return html;
     }
@@ -291,9 +205,11 @@ public class ExtractModList {
      */
     public void addObjectToJson(List<ModInfo> objectList) throws Exception {
     	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 	
-    	BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(jsonFile, true), StandardCharsets.UTF_8));
-    	gson.toJson(objectList, fw);
-		fw.close();
+    	FileWriter fw = new FileWriter(jsonFile);
+    	fw.close();
+    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(jsonFile, true), StandardCharsets.UTF_8));
+    	gson.toJson(objectList, bw);
+    	bw.close();
     }
     
     /**********
@@ -304,6 +220,7 @@ public class ExtractModList {
     public void addObjectToJson(ModInfo object) throws Exception {
     	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
     	FileReader fr = new FileReader(jsonFile);
+    	
         Type modInfoListType = new TypeToken<List<ModInfo>>(){}.getType();
         List<ModInfo> oldJson = gson.fromJson(fr, modInfoListType);
         fr.close();
@@ -329,24 +246,22 @@ public class ExtractModList {
 	        
     }
     
-    public ModInfo getObjectFromJson(String code) throws Exception {
+    public ModInfo getObjectFromJson(String code) throws IOException {
     	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
-    	FileReader fr = new FileReader(jsonFile);
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile), StandardCharsets.UTF_8));
+
         Type modInfoListType = new TypeToken<List<ModInfo>>(){}.getType();
-        List<ModInfo> oldJson = gson.fromJson(fr, modInfoListType);
-        fr.close();
+        List<ModInfo> oldJson = gson.fromJson(br, modInfoListType);
+        br.close();
         
-        try {
-	        for(int i = 0; i < oldJson.size(); i++) {
-	        	if(code.equals(oldJson.get(i).getCode())) {
-	        		return oldJson.get(i); 	
-	        	}
-	        }
-        } catch(Exception e) {
-        	e.printStackTrace();
+        ModInfo oldModInfo;
+        for(int i = 0; i < oldJson.size(); i++) {
+        	oldModInfo = oldJson.get(i);
+        	if(code.equals(oldModInfo.getCode()) && !oldModInfo.getName().isEmpty()) {
+        		return oldJson.get(i); 	
+        	}
         }
-        
-        return new ModInfo("NULL", false);
+		throw new IOException();
     }
     
     public boolean checkIfEmpty() {

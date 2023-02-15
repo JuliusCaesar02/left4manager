@@ -54,6 +54,13 @@ public class ModInfo{
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+	public void setInfo(String name, String author, String description, List<Tags> tags) {
+		this.name = name;
+		this.author = author;
+		this.description = description;
+		this.tags = tags;
+	}
+	
 	public String getCode() {
 		return this.code;
 	}

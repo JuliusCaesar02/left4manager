@@ -2,6 +2,8 @@ package left4managerFunction;
 
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -9,6 +11,9 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.LayoutManager2;
 import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -22,7 +27,11 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -30,6 +39,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -51,6 +61,8 @@ import java.awt.Dimension;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
@@ -62,8 +74,6 @@ import javax.swing.table.*;
 public class Gui {
 
 	private JFrame frame;
-	JLabel imgLabel = new JLabel();
-	JTextPane textDescription = new JTextPane();
 	Config config = new Config();
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
@@ -75,6 +85,7 @@ public class Gui {
 			public void run() {
 				try {
 					Gui window = new Gui();
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -207,8 +218,9 @@ public class Gui {
 				config.setL4D2Dir(input.getText());
 				File file = new File(config.getL4D2Dir());
 				if (file.getName().equals("Left 4 Dead 2")) {
-					initialize();
+					JProgressBar progressBar = new JProgressBar(0, 100);
 					config.writeFile();
+					initialize();
 					chooseDirectory.dispose();
 				} else {
 					JOptionPane.showMessageDialog(frame,
@@ -248,27 +260,118 @@ public class Gui {
 	}
 
 	private void initialize() {
-		extractModList = new ExtractModList(config);
 		updateModFile = new UpdateModFile(config);
 		allTags = new AllTags(config);
-
-		try {
-			extractModList.populateModList();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		extractModList = new ExtractModList(config);
+		
+		JFrame loadingFrame = new JFrame("Mod info loading");
+		loadingFrame.setBounds(200, 200, 500, 150);
+		loadingFrame.setLocationRelativeTo(null);
+		loadingFrame.setVisible(true);
+		loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+		JProgressBar loadingBar = new JProgressBar(0, 100);
+		loadingBar.setStringPainted(true);
+		Color loadingBarColor = new Color(28, 99, 214);
+		loadingBar.setForeground(loadingBarColor);
+		JLabel modInfoLabel = new JLabel();
+		JLabel fractionLabel = new JLabel();
+		JPanel labelPanel = new JPanel();
+		labelPanel.setLayout(new BorderLayout());
+		labelPanel.add(modInfoLabel, BorderLayout.LINE_START);
+		labelPanel.add(fractionLabel, BorderLayout.LINE_END);
+		JPanel headerPanel = new JPanel();
+		JLabel headerLabel = new JLabel("Fetching mod info. The first time could take a while");
+		headerPanel.add(headerLabel);
+		mainPanel.add(headerPanel);
+		mainPanel.add(loadingBar);
+		mainPanel.add(labelPanel);
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		loadingFrame.add(mainPanel);
+		
+		class PopulateModList extends SwingWorker<Void, Double> {	
+			@Override
+			protected Void doInBackground() throws Exception {
+				List<ModInfo> l4d2ModList = new ArrayList<ModInfo>();
+				
+				try {
+					l4d2ModList = extractModList.readL4d2ModList();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				extractModList.createJsonFile();
+				double totalProgress = 0;
+				int listSize = l4d2ModList.size();
+				double progress = (100.0 / listSize);
+				String modName = "";
+				for(int i = 0; i < l4d2ModList.size(); i++) {
+					ModInfo singleMod = l4d2ModList.get(i);
+					try {
+						ModInfo objectFromJson = extractModList.getObjectFromJson(singleMod.getCode());
+						System.out.println("Mod found in json");
+						objectFromJson.setEnabled(singleMod.getEnabled());
+						extractModList.getModList().add(objectFromJson);	
+						modName = objectFromJson.getName();
+						System.out.println(objectFromJson.getName());
+					} catch (NullPointerException | IOException e) {
+						System.out.println("Mod NOT found in json");
+						try {
+							String html = extractModList.getHtml(singleMod.getCode());
+							String[] additionalInfo =  extractModList.getAdditionalInfo(html);
+							List<Tags> tags =  extractModList.getTags(html);
+							modName = additionalInfo[0];
+							singleMod.setInfo(additionalInfo[0], additionalInfo[1], additionalInfo[2], tags);
+							extractModList.getModList().add(singleMod);		
+						} catch(IOException f) {
+							System.out.println("No internet");
+							headerLabel.setText("No internet connection");
+							extractModList.getModList().add(l4d2ModList.get(i));
+						}
+					}
+					totalProgress += progress;
+					setProgress((int) Math.round(totalProgress));
+					modInfoLabel.setText("Getting info for " +modName);
+					fractionLabel.setText("Mod " +(i + 1) +"/" +listSize);
+				}
+				
+				try {
+					extractModList.addObjectToJson(extractModList.getModList());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return null;
+			}
+			
+			@Override
+			protected void done() {
+				frame = new JFrame("Left4Manager");
+				frame.setBounds(200, 200, 1080, 720);
+				frame.setLocationRelativeTo(null);
+				frame.add(createTabbedPane());
+				frame.setVisible(true);
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				loadingFrame.setVisible(false);
+	       }
 		}
-
-		frame = new JFrame("Left4Manager");
-		frame.setBounds(200, 200, 1080, 720);
-		frame.setLocationRelativeTo(null);
-		frame.add(createTabbedPane());
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		debug();
+		
+		PopulateModList pupulateModList = new PopulateModList();
+		pupulateModList.addPropertyChangeListener(
+		     new PropertyChangeListener() {
+		         public  void propertyChange(PropertyChangeEvent evt) {
+		             if ("progress".equals(evt.getPropertyName())) {
+		            	 loadingBar.setValue((Integer) evt.getNewValue());
+		             }
+		         }
+		});
+		pupulateModList.execute();
 	}
 
+	   
+	
 	public JTabbedPane createTabbedPane() {
 		JPanel tab1 = new JPanel();
 		JPanel tab2 = new JPanel();
@@ -341,27 +444,49 @@ public class Gui {
 				JMenu addToGroupButton = new JMenu("Add to group");
 				JMenu removeFromGroupButton = new JMenu("Remove from group");
 				JMenuItem refreshInfoesButton = new JMenuItem("Refresh info");
+				JMenuItem copyButton = new JMenuItem("Copy");
 
 				tablePopupMenu.add(addToGroupButton);
 				tablePopupMenu.add(removeFromGroupButton);
 				tablePopupMenu.add(refreshInfoesButton);
+				tablePopupMenu.add(copyButton);
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						int rowAtPoint = table
-								.rowAtPoint(SwingUtilities.convertPoint(tablePopupMenu, new Point(0, 0), table));
+						int rowAtPoint = table.rowAtPoint(SwingUtilities.convertPoint(tablePopupMenu, new Point(0, 0), table));
+						int columnAtPoint = table.columnAtPoint(SwingUtilities.convertPoint(tablePopupMenu, new Point(0, 0), table));
+ 
 						if (rowAtPoint > -1) {
 							table.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+							table.setColumnSelectionInterval(columnAtPoint, columnAtPoint);
 							String selectedModCode = table.getValueAt(table.getSelectedRow(), 1).toString();
 							refreshInfoesButton.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
-									String[] additionalInfo = extractModList.getAdditionalInfo(selectedModCode);
-									int modIndex = extractModList.getModIndexByCode(selectedModCode);
-									extractModList.getModList().get(modIndex).setName(additionalInfo[0]);
-									extractModList.getModList().get(modIndex).setAuthor(additionalInfo[1]);
-									extractModList.getModList().get(modIndex).setDescription(additionalInfo[2]);
+									String html = "";
+									try {
+										html = extractModList.getHtml(selectedModCode);
+										String[] additionalInfo = extractModList.getAdditionalInfo(html);
+										List<Tags> tagList = extractModList.getTags(html);
+										int modIndex = extractModList.getModIndexByCode(selectedModCode);
+										extractModList.getModList().get(modIndex).setInfo(additionalInfo[0],
+												additionalInfo[1],
+												additionalInfo[2],
+												tagList
+												);
+										System.out.println(selectedModCode + " refreshed");
+									} catch (Exception e1) {
+										System.out.println("No connection");
+										//e1.printStackTrace();
+									}
 								}
 							});
+							copyButton.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+									StringSelection content = new StringSelection(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString());
+								    clipboard.setContents(content, content);
+								}
+							});						
 							JMenuItem newGroupItem = new JMenuItem("New group");
 							newGroupItem.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
@@ -422,23 +547,10 @@ public class Gui {
 		table.setShowHorizontalLines(true);
 		table.setRowSorter(sorter);
 
-		leftPane.add(new JScrollPane(table));
-
-		JPanel rightPane = new JPanel();
-		rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
-		JPanel descriptionPane = new JPanel();
-		descriptionPane.setLayout(new BoxLayout(descriptionPane, BoxLayout.PAGE_AXIS));
-		// descriptionPane.add(imgLabel);
-		textDescription.setEditable(false);
-		textDescription.setContentType("text/html");
-		textDescription.setFont(new Font("MS Song", Font.PLAIN, 14));
-
-		descriptionPane.add(textDescription);
-		descriptionPane.add(imgLabel);
-		JButton saveButton = new JButton("Save");
-		rightPane.add(new JScrollPane(descriptionPane));
-		rightPane.add(saveButton);
-
+		JScrollPane tableScrollPane = new JScrollPane(table);
+		tableScrollPane.setBorder(null);
+		leftPane.add(tableScrollPane);
+		
 		selectAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TableModel model = table.getModel();
@@ -448,32 +560,134 @@ public class Gui {
 				}
 			}
 		});
-
+		
+		JPanel rightPanel = new JPanel();
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent event) {
-				String code = table.getValueAt(table.getSelectedRow(), 1).toString();
-				BufferedImage img = null;
+			public void valueChanged(ListSelectionEvent event) {	
+				JPanel panel = new JPanel();
 				try {
-					img = ImageIO.read(new File(config.getL4D2Dir() + File.separator + "left4dead2" + File.separator
-							+ "addons" + File.separator + "workshop" + File.separator + code + ".jpg"));
-					textDescription.setText(extractModList.getModInfoByCode(code).getDescription());
-					imgLabel.setIcon(new ImageIcon(img));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					panel = createRigthPanel(extractModList.getModList().get(table.convertRowIndexToModel(table.getSelectedRow())));
+				} catch(Exception e) {
 				}
+				listPane.remove(1);
+				listPane.revalidate();
+				listPane.add(panel);
 			}
 		});
+		listPane.add(leftPane);
+		rightPanel = createRigthPanel(extractModList.getModList().get(0));
+		listPane.add(rightPanel);
 
+		return listPane;
+	}
+	
+	public JPanel createRigthPanel(ModInfo mod) {
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+		
+		JLabel modTitle = new JLabel(mod.getName());
+		modTitle.setFont(new Font(null, Font.PLAIN, 22));
+		modTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		JPanel tagsPanel = new JPanel();
+		//tagsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		tagsPanel.setLayout(new BoxLayout(tagsPanel, BoxLayout.PAGE_AXIS));
+		
+		List<Tags> modTag = mod.getTags();
+		for(int i = 0; i < modTag.size(); i++) {
+			Tags singleModTag = modTag.get(i);
+			JPanel singleModPanel = new JPanel();
+			JLabel primaryTagLabel = new JLabel("<html>" +"<B>" +singleModTag.getPrimaryTag() +"</B>" +" -" +"</html>");
+			List<String> secondaryTagList = singleModTag.getSecondaryTag();
+			singleModPanel.add(primaryTagLabel);
+			for(int j = 0; j < secondaryTagList.size(); j++) {
+				JLabel secondaryTagLabel = new JLabel(secondaryTagList.get(j));
+				singleModPanel.add(secondaryTagLabel);
+			}
+			tagsPanel.add(singleModPanel);
+		}
+		
+		JPanel descriptionPane = new JPanel();
+		descriptionPane.setLayout(new BoxLayout(descriptionPane, BoxLayout.PAGE_AXIS));
+		
+		JPanel textDescriptionPanel = new JPanel();
+		textDescriptionPanel.setLayout(new BoxLayout(textDescriptionPanel, BoxLayout.PAGE_AXIS));
+		
+		JTextPane textDescription = new JTextPane();
+		textDescription.setEditable(false);
+		textDescription.setContentType("text/html");
+		textDescription.setFont(new Font("MS Song", Font.PLAIN, 14));
+		textDescription.setText(mod.getDescription());
+		textDescription.setBackground(mainPanel.getBackground());
+		textDescriptionPanel.add(textDescription);
+
+		
+		textDescriptionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		textDescriptionPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		
+		
+		JButton saveButton = new JButton("Save");
+		JScrollPane rightScrollPane = new JScrollPane(descriptionPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		rightScrollPane.setBorder(null);
+		
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateModFile.writeFile(updateModFile.buildString(extractModList.getModList()));
 			}
 		});
+		int scrollPaneWidth = 0;
+		if(rightScrollPane.getVerticalScrollBar().isVisible()) {
+			scrollPaneWidth = rightScrollPane.getVerticalScrollBar().getPreferredSize().width;
+		}
+		textDescription.setMaximumSize(new Dimension(((frame.getSize().width/2) - 20 - scrollPaneWidth), 100000));
 
-		listPane.add(leftPane);
-		listPane.add(rightPane);
-		return listPane;
+		frame.addComponentListener(new ComponentAdapter() {  
+			int scrollPaneWidth = 0;
+			public void componentResized(ComponentEvent evt) {
+				if(rightScrollPane.getVerticalScrollBar().isVisible()) {
+					scrollPaneWidth = rightScrollPane.getVerticalScrollBar().getPreferredSize().width;
+				}
+				textDescription.setMaximumSize(new Dimension(((frame.getSize().width/2) - 20 - scrollPaneWidth), 100000));
+				textDescription.revalidate();
+			}
+		});
+		
+		mainPanel.add(modTitle);
+		mainPanel.add(tagsPanel);
+		try {
+			BufferedImage img = ImageIO.read(new File(config.getL4D2Dir() + File.separator + "left4dead2" + File.separator
+					+ "addons" + File.separator + "workshop" + File.separator + mod.getCode() + ".jpg"));
+			double panelWidth = (frame.getSize().width/2) - 30 - scrollPaneWidth;
+			
+			BufferedImage resizedImg;
+			if(img.getWidth() > panelWidth) {
+				double ratio = (double)(img.getWidth()) / img.getHeight();
+				System.out.println("true");
+				
+				int newWidth = (int) panelWidth;
+				int newHeight = (int) (panelWidth / ratio);
+				resizedImg = new BufferedImage(newWidth, newHeight, img.getType());
+				Graphics2D g = resizedImg.createGraphics();
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				g.drawImage(img, 0, 0, newWidth, newHeight, 0, 0, img.getWidth(),img.getHeight(), null);
+				g.dispose();
+			}
+			else {
+				System.out.println("false");
+				resizedImg = img;
+			}
+			JLabel imgLabel = new JLabel();
+			imgLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+			imgLabel.setIcon(new ImageIcon(resizedImg));
+			descriptionPane.add(imgLabel);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		descriptionPane.add(textDescriptionPanel);
+		mainPanel.add(rightScrollPane);
+		mainPanel.add(saveButton);
+		return mainPanel;
 	}
 
 	public JPanel createFilterPanel(TableRowSorter<GroupModTableModel> sorter, GroupModTableModel tableModel) {
