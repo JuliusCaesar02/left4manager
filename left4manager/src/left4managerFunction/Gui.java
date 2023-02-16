@@ -990,8 +990,13 @@ public class Gui {
 			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 				JMenuItem renameButton = new JMenuItem("Rename");
+				JMenuItem addGroupButton = new JMenuItem("Add group");
+				JMenuItem removeGroupButton = new JMenuItem("Remove group");
+
 
 				popupMenu.add(renameButton);
+				popupMenu.add(addGroupButton);
+				popupMenu.add(removeGroupButton);
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -1023,6 +1028,25 @@ public class Gui {
 									mainPanel.add(groupNameInput);
 									mainPanel.add(applyButton, BorderLayout.LINE_END);
 									renameFrame.add(mainPanel);
+								}
+							}
+						});
+						addGroupButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								addNewGroupPopUp(-2);
+							}
+						});
+						removeGroupButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								int index = groupJList.getMinSelectionIndex();
+								if (index >= 0) {
+									listModel.remove(index);
+									if (index > 0) {
+										groupJList.setSelectedIndex(index);
+									}
+									config.writeModGroupFile(listModel);
 								}
 							}
 						});
