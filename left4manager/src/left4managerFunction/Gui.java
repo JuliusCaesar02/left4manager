@@ -330,6 +330,15 @@ public class Gui {
 			@Override
 			protected void done() {
 				frame = new JFrame("Left4Manager");
+				BufferedImage icon;
+				try {
+					System.out.println(config.getL4D2Dir() +File.separator +"icon" +File.separator +"icon.jpg");
+					icon = ImageIO.read(new File(config.getL4managerDir() +File.separator +"icon" +File.separator +"icon.png"));
+					frame.setIconImage(icon);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				frame.setBounds(200, 200, 1080, 720);
 				frame.setLocationRelativeTo(null);
 				frame.add(createTabbedPane());
@@ -975,6 +984,65 @@ public class Gui {
 		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		groupJList.setSelectedIndex(0);
 		groupJList.setVisibleRowCount(5);
+				
+		JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				JMenuItem renameButton = new JMenuItem("Rename");
+
+				popupMenu.add(renameButton);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						int selectedItem = groupJList.locationToIndex(SwingUtilities.convertPoint(popupMenu, new Point(0, 0), groupJList));
+						groupJList.setSelectedIndex(selectedItem);
+						renameButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								if (selectedItem > -1) {
+									JFrame renameFrame = new JFrame("Rename mod group");
+									System.out.println("ciao");
+									renameFrame.setVisible(true);
+									renameFrame.setBounds(0, 0, 300, 70);
+									renameFrame.setLocationRelativeTo(null);
+									renameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+									JTextField groupNameInput = new JTextField();
+									groupNameInput.setText(listModel.getElementAt(selectedItem).getGroupName());
+									JButton applyButton = new JButton("Apply");
+									applyButton.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											listModel.getElementAt(selectedItem).setGroupName(groupNameInput.getText());
+											config.writeModGroupFile(listModel);
+											renameFrame.dispose();
+										}
+									});
+									JPanel mainPanel = new JPanel();
+									mainPanel.setLayout(new BorderLayout());
+									mainPanel.add(groupNameInput);
+									mainPanel.add(applyButton, BorderLayout.LINE_END);
+									renameFrame.add(mainPanel);
+								}
+							}
+						});
+					}
+				});
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				popupMenu.removeAll();
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+				popupMenu.removeAll();
+			}
+		});
+
+		groupJList.setComponentPopupMenu(popupMenu);
+				
 		JScrollPane listScrollPane = new JScrollPane(groupJList);
 		listScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -1110,8 +1178,9 @@ public class Gui {
 
 		if (selectedIndex != -2) {
 			addNewGroupFrame.setTitle("Modify group");
-			groupNameLabel.setText(listModel.getElementAt(selectedIndex).getGroupName());
 			groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
+			groupNameInput.setText(listModel.getElementAt(selectedIndex).getGroupName());
+			groupNamePane.add(groupNameInput);
 			for (int i = 0; i < listModel.getElementAt(selectedIndex).getSize(); i++) {
 				newGroupModel.add(extractModList.getModInfoByCode(listModel.getElementAt(selectedIndex).getGroupMod(i)));
 			}
@@ -1217,7 +1286,6 @@ public class Gui {
 				} else {
 					String groupName = groupNameInput.getText();
 					if (selectedIndex != -2) {
-						groupName = listModel.getElementAt(selectedIndex).getGroupName();
 						listModel.remove(selectedIndex);
 					}
 					ModGroup newGroup = new ModGroup(groupName);
