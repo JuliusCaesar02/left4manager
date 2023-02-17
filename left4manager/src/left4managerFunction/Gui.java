@@ -22,6 +22,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -45,6 +46,7 @@ import java.nio.file.Paths;
 
 import javax.swing.table.*;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -79,7 +81,7 @@ public class Gui {
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
 	AllTags allTags;
-	GroupListModel listModel = new GroupListModel();
+	GroupListTableModel groupListModel = new GroupListTableModel();
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -486,18 +488,18 @@ public class Gui {
 							});
 							addToGroupButton.add(newGroupItem);
 							addToGroupButton.addSeparator();
-							for (int i = 0; i < listModel.getSize(); i++) {
+							for (int i = 0; i < groupListModel.getRowCount(); i++) {
 								boolean exist = false;
-								for (int j = 0; j < listModel.getElementAt(i).getSize(); j++) {
-									if (listModel.getElementAt(i).getGroupMod(j).equals(selectedModCode)) {
+								for (int j = 0; j < groupListModel.getRow(i).getSize(); j++) {
+									if (groupListModel.getRow(i).getGroupMod(j).equals(selectedModCode)) {
 										final int index = i;
 
 										JMenuItem removeFromGroupItem = new JMenuItem(
-												listModel.getElementAt(i).getGroupName());
+												groupListModel.getGroupName(i));
 										removeFromGroupItem.addActionListener(new ActionListener() {
 											public void actionPerformed(ActionEvent e) {
-												listModel.getElementAt(index).remove(selectedModCode);
-												config.writeModGroupFile(listModel);
+												groupListModel.getRow(index).remove(selectedModCode);
+												config.writeModGroupFile(groupListModel.getList());
 											}
 										});
 										removeFromGroupButton.add(removeFromGroupItem);
@@ -506,11 +508,11 @@ public class Gui {
 								}
 								if (!exist) {
 									final int index = i;
-									JMenuItem addToGroupItem = new JMenuItem(listModel.getElementAt(i).getGroupName());
+									JMenuItem addToGroupItem = new JMenuItem(groupListModel.getGroupName(i));
 									addToGroupItem.addActionListener(new ActionListener() {
 										public void actionPerformed(ActionEvent e) {
-											listModel.getElementAt(index).add(selectedModCode);
-											config.writeModGroupFile(listModel);
+											groupListModel.getRow(index).add(selectedModCode);
+											config.writeModGroupFile(groupListModel.getList());
 										}
 									});
 									addToGroupButton.add(addToGroupItem);
@@ -931,101 +933,160 @@ public class Gui {
 		}
 	}
 
-	public static class GroupListModel extends AbstractListModel {
+	public static class GroupListTableModel extends AbstractTableModel {
+
+		protected static final String[] COLUMN_NAMES = { "Name" };
+
 		private List<ModGroup> rowData;
+		private int columnCount;
+		private List<Boolean> editableRow;
 
-		public GroupListModel() {
+		public GroupListTableModel() {
 			rowData = new ArrayList<ModGroup>();
-		}
-
-		public GroupListModel(List<ModGroup> data) {
-			this.rowData = new ArrayList<ModGroup>();
-			add(data);
+			editableRow = new ArrayList<Boolean>();
+			this.columnCount = COLUMN_NAMES.length;
 		}
 
 		@Override
-		public int getSize() {
-			return rowData.size();
+		public boolean isCellEditable(int row, int column) {
+			return this.editableRow.get(row);
+		}
+		
+		public void setRowEditable(int row, boolean value) {
+			this.editableRow.set(row, value);
+		}
+		public void setAllRowEditable(boolean value) {
+			for(int i = 0; i < editableRow.size(); i++) {
+				this.editableRow.set(i, value);
+			}
+			
 		}
 
 		@Override
-		public ModGroup getElementAt(int index) {
-			return rowData.get(index);
-		}
-
-		public ModGroup getLastElement() {
-			return rowData.get(getSize() - 1);
-		}
-
-		public ModGroup getFirstElement() {
-			return rowData.get(0);
-		}
-
-		public void add(List<ModGroup> data) {
-			int oldLenght = getSize() - 1;
-			if (oldLenght < 0) {
-				oldLenght = 0;
-			}
-			if(data != null) {
-				rowData.addAll(data);
-				fireIntervalAdded(this, oldLenght, getSize() - 1);
+		public Class<?> getColumnClass(int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return String.class;
+			default:
+				return String.class;
 			}
 		}
 
-		public List<ModGroup> get() {
-			return rowData;
+		public void add(List<ModGroup> modList) {
+			for(int i = 0; i < modList.size(); i++) {
+				this.editableRow.add(false);
+			}
+			rowData.addAll(modList);
+			fireTableDataChanged();
 		}
 
 		public void add(ModGroup... pd) {
 			add(Arrays.asList(pd));
 		}
 
-		public void remove(int index) {
-			rowData.remove(index);
-			fireIntervalRemoved(this, index, index);
-		}
-
-		public void removeModByIndex(int groupIndex, int modIndex) {
-			rowData.get(groupIndex).remove(modIndex);
-		}
-
-		public void removeModByIndex(int groupIndex, int[] index) {
-			for (int i = 0; i < index.length; i++) {
-				rowData.get(groupIndex).remove(index[i] - i);
-			}
-		}
-
 		public void clear() {
 			rowData.clear();
-			fireIntervalRemoved(this, 0, getSize());
+			fireTableDataChanged();
 		}
-	}
 
-	public class GroupListRenderer extends JLabel implements ListCellRenderer<ModGroup> {
+		public void remove(int index) {
+			this.editableRow.remove(index);
+			rowData.remove(index);
+			fireTableDataChanged();
+		}
+
 		@Override
-		public Component getListCellRendererComponent(JList<? extends ModGroup> list, ModGroup value, int index,
-				boolean isSelected, boolean cellHasFocus) {
-			setText(value.getGroupName());
-			if (isSelected) {
-				setBackground(list.getSelectionBackground());
-				setForeground(list.getSelectionForeground());
-			} else {
-				setBackground(list.getBackground());
-				setForeground(list.getForeground());
-			}
-			setEnabled(list.isEnabled());
-			setFont(list.getFont());
-			setOpaque(true);
-			return this;
+		public int getRowCount() {
+			return rowData.size();
 		}
+
+		@Override
+		public int getColumnCount() {
+			return this.columnCount;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			return COLUMN_NAMES[column];
+		}
+
+		public ModGroup getRow(int row) {
+			return rowData.get(row);
+		}
+
+		public List<ModGroup> getRow(int[] row) {
+			List<ModGroup> groupList = new ArrayList<>();
+			for (int i = 0; i < row.length; i++) {
+				groupList.add(getRow(row[i]));
+			}
+			return groupList;
+		}
+
+		@Override
+		public void setValueAt(Object value, int row, int column) {
+			switch (column) {
+			case 0:
+				getRow(row).setGroupName((String) value);
+				fireTableCellUpdated(row, column);
+			default:
+				break;
+			}
+		}
+		
+		public String getGroupName(int row) {
+			return rowData.get(row).getGroupName();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			ModGroup modGroup = getRow(rowIndex);
+			Object value = null;
+			switch (columnIndex) {
+			case 0:
+				value = modGroup.getGroupName();
+				break;
+			default:
+				break;
+			}
+			return value;
+		}
+
+		public void repaint() {
+			fireTableDataChanged();
+		}
+		
+		public int getIndexByModInfo(ModGroup mod) {
+			return rowData.indexOf(mod);
+		}
+		
+		public List<ModGroup> getList() {
+			return this.rowData;
+		}
+
 	}
 
+	public class CustomCellEditor extends DefaultCellEditor  implements TableCellEditor {
+		public CustomCellEditor(JTextField textField) {
+            super(textField);
+        }
+
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            Component c = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+            if (c instanceof JTextComponent) {
+                JTextComponent jtc = (JTextComponent) c;
+                jtc.requestFocus();
+                jtc.selectAll();
+            }
+            return c;
+        }
+    }
+	
 	public JPanel createGroupTab() {
 		GroupModTableModel model = new GroupModTableModel();
 		JTable table = new JTable(model);
 
 		try {
-			listModel.add(config.readModGroupFile());
+			groupListModel.add(config.readModGroupFile());
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -1043,83 +1104,98 @@ public class Gui {
 		c.anchor = GridBagConstraints.LINE_START;
 		c.weightx = 0.10;
 		c.weighty = 1;
+		
+		JTextField editorField = new JTextField();
+		CustomCellEditor groupTableRenderer = new CustomCellEditor(editorField);
+		JTable groupListTable = new JTable(groupListModel) {
+			 @Override
+	         public CustomCellEditor getCellEditor(int row, int column) {
+				 return groupTableRenderer;
+			 }
+		};
+		
+		editorField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                TableCellEditor cellEditor = groupListTable.getCellEditor();
+        		System.out.println(cellEditor.getCellEditorValue());
 
-		JList groupJList = new JList(listModel);
-		groupJList.setCellRenderer(new GroupListRenderer());
-		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                if (cellEditor != null) {
+                	if (!cellEditor.stopCellEditing()) {
+                		cellEditor.cancelCellEditing();
+                	}
+                }
+                groupListModel.setAllRowEditable(false);
+            }
+        });
+		groupListTable.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                TableCellEditor cellEditor = groupListTable.getCellEditor();
 
-		groupJList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				int selectionIndex = groupJList.getMinSelectionIndex();
+        		System.out.println(cellEditor.getCellEditorValue());
+                if (cellEditor != null) {
+                	if (!cellEditor.stopCellEditing()) {
+                		cellEditor.cancelCellEditing();
+                	}
+                }
+                groupListModel.setAllRowEditable(false);
+            }
+        });
+		
+		groupListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		groupListTable.setRowSelectionInterval(0, 0);
+		groupListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	        public void valueChanged(ListSelectionEvent event) {
+				int selectionIndex = groupListTable.getSelectedRow();
 				model.clear();
-				if (selectionIndex < 0 || selectionIndex > listModel.getSize() - 1) {
+				if (selectionIndex < 0 || selectionIndex > groupListModel.getRowCount() - 1) {
 					selectionIndex = 0;
 				}
-				if (listModel.getSize() > 0) {
+				if (groupListModel.getRowCount() > 0) {
 					List<ModInfo> newModList = new ArrayList<ModInfo>();
 					List<ModInfo> modList = extractModList.getModList();
 					System.out.println(selectionIndex);
-					ModGroup selectedGroup = listModel.getElementAt(selectionIndex);
+					ModGroup selectedGroup = groupListModel.getRow(selectionIndex);
 					for (int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
-						int index = extractModList.getModIndexByCode(selectedGroup.getGroupMod(i));
-						if (index >= 0) {
-							newModList.add(modList.get(index));
-						}
+						ModInfo singleMod = extractModList.getModInfoByCode(selectedGroup.getGroupMod(i));
+						newModList.add(singleMod);
 					}
 					model.add(newModList);
 				}
-			}
-		});
-
-		groupJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		groupJList.setSelectedIndex(0);
-		groupJList.setVisibleRowCount(5);
-				
-		JPopupMenu popupMenu = new JPopupMenu();
-		popupMenu.addPopupMenuListener(new PopupMenuListener() {
-			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				JMenuItem renameButton = new JMenuItem("Rename");
-				JMenuItem addGroupButton = new JMenuItem("Add group");
-				JMenuItem removeGroupButton = new JMenuItem("Remove group");
-
-
-				popupMenu.add(renameButton);
-				popupMenu.add(addGroupButton);
-				popupMenu.add(removeGroupButton);
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						int selectedItem = groupJList.locationToIndex(SwingUtilities.convertPoint(popupMenu, new Point(0, 0), groupJList));
-						groupJList.setSelectedIndex(selectedItem);
+	        }
+	    });
+		
+		groupListTable.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseReleased(MouseEvent e) {
+		        if (SwingUtilities.isRightMouseButton(e)) {      
+			        int r = groupListTable.rowAtPoint(e.getPoint());
+			        System.out.println(r);
+			        if (r < 0 || r >= groupListTable.getRowCount()) {
+			        	System.out.println("ciao");
+			        	groupListTable.setRowSelectionInterval(0, 0);
+			        }
+			        else {
+			        	groupListTable.setRowSelectionInterval(r, r);
+			        }
+			        
+			        int selectedRow = groupListTable.getSelectedRow();
+			        
+			        if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+			            JPopupMenu popupMenu = new JPopupMenu();
+			            JMenuItem renameButton = new JMenuItem("Rename");
+						JMenuItem addGroupButton = new JMenuItem("Add group");
+						JMenuItem removeGroupButton = new JMenuItem("Remove group");
+						popupMenu.add(renameButton);
+						popupMenu.add(addGroupButton);
+						popupMenu.add(removeGroupButton);
 						renameButton.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								if (selectedItem > -1) {
-									JFrame renameFrame = new JFrame("Rename mod group");
-									System.out.println("ciao");
-									renameFrame.setVisible(true);
-									renameFrame.setBounds(0, 0, 300, 70);
-									renameFrame.setLocationRelativeTo(null);
-									renameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-									JTextField groupNameInput = new JTextField();
-									groupNameInput.setText(listModel.getElementAt(selectedItem).getGroupName());
-									JButton applyButton = new JButton("Apply");
-									applyButton.addActionListener(new ActionListener() {
-										@Override
-										public void actionPerformed(ActionEvent e) {
-											listModel.getElementAt(selectedItem).setGroupName(groupNameInput.getText());
-											config.writeModGroupFile(listModel);
-											renameFrame.dispose();
-										}
-									});
-									JPanel mainPanel = new JPanel();
-									mainPanel.setLayout(new BorderLayout());
-									mainPanel.add(groupNameInput);
-									mainPanel.add(applyButton, BorderLayout.LINE_END);
-									renameFrame.add(mainPanel);
-								}
+								groupListModel.setRowEditable(selectedRow, true);
+								groupListTable.editCellAt(selectedRow, 0);
+								
 							}
 						});
 						addGroupButton.addActionListener(new ActionListener() {
@@ -1131,34 +1207,21 @@ public class Gui {
 						removeGroupButton.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								int index = groupJList.getMinSelectionIndex();
-								if (index >= 0) {
-									listModel.remove(index);
-									if (index > 0) {
-										groupJList.setSelectedIndex(index);
-									}
-									config.writeModGroupFile(listModel);
+								groupListModel.remove(selectedRow);
+								if (selectedRow < 0 | selectedRow >= groupListModel.getRowCount()) {
+									groupListTable.setRowSelectionInterval(0, 0);
 								}
+								config.writeModGroupFile(groupListModel.getList());
 							}
 						});
-					}
-				});
-			}
-
-			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				popupMenu.removeAll();
-			}
-
-			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {
-				popupMenu.removeAll();
-			}
+			            
+			            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			        }
+		        }
+		    }
 		});
-
-		groupJList.setComponentPopupMenu(popupMenu);
 				
-		JScrollPane listScrollPane = new JScrollPane(groupJList);
+		JScrollPane listScrollPane = new JScrollPane(groupListTable);
 		listScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		JPanel buttonPanel = new JPanel();
@@ -1177,14 +1240,12 @@ public class Gui {
 		removeGroup.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int index = groupJList.getMinSelectionIndex();
-				if (index >= 0) {
-					listModel.remove(index);
-					if (index > 0) {
-						groupJList.setSelectedIndex(index);
-					}
-					config.writeModGroupFile(listModel);
+				int index = groupListTable.getSelectedRow();
+				groupListModel.remove(index);
+				if (index > 0 | index >= groupListModel.getRowCount()) {
+					groupListTable.setRowSelectionInterval(0, 0);
 				}
+				config.writeModGroupFile(groupListModel.getList());
 			}
 		});
 
@@ -1229,8 +1290,8 @@ public class Gui {
 		addModButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (groupJList.getMinSelectionIndex() >= 0) {
-					addNewGroupPopUp(groupJList.getMinSelectionIndex());
+				if (groupListTable.getSelectedRow() >= 0) {
+					addNewGroupPopUp(groupListTable.getSelectedRow());
 				}
 			}
 		});
@@ -1250,7 +1311,7 @@ public class Gui {
 						int rowIndex = model.getIndexByModInfo(rowValue);
 						model.remove(rowIndex);
 					}
-					config.writeModGroupFile(listModel);
+					config.writeModGroupFile(groupListModel.getList());
 				}
 			}
 		});
@@ -1289,15 +1350,15 @@ public class Gui {
 		JLabel groupNameLabel = new JLabel("Group name");
 		groupNameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 		JTextField groupNameInput = new JTextField();
-		groupNameInput.setText("Group" + (listModel.getSize() + 1));
+		groupNameInput.setText("Group" + (groupListModel.getRowCount() + 1));
 
 		if (selectedIndex != -2) {
 			addNewGroupFrame.setTitle("Modify group");
 			groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
-			groupNameInput.setText(listModel.getElementAt(selectedIndex).getGroupName());
+			groupNameInput.setText(groupListModel.getGroupName(selectedIndex));
 			groupNamePane.add(groupNameInput);
-			for (int i = 0; i < listModel.getElementAt(selectedIndex).getSize(); i++) {
-				newGroupModel.add(extractModList.getModInfoByCode(listModel.getElementAt(selectedIndex).getGroupMod(i)));
+			for (int i = 0; i < groupListModel.getRow(selectedIndex).getSize(); i++) {
+				newGroupModel.add(extractModList.getModInfoByCode(groupListModel.getRow(selectedIndex).getGroupMod(i)));
 			}
 		} else {
 			groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
@@ -1313,7 +1374,7 @@ public class Gui {
 		allModTable.setRowSorter(sorter);
 		allModModel.add(extractModList.getModList());
 		if (selectedIndex != -2) {
-			ModGroup group = listModel.getElementAt(selectedIndex);
+			ModGroup group = groupListModel.getRow(selectedIndex);
 			for(String modCode : group.getGroupModList()) {
 				allModModel.remove(allModModel.getIndexByCode(modCode));
 			}
@@ -1401,14 +1462,14 @@ public class Gui {
 				} else {
 					String groupName = groupNameInput.getText();
 					if (selectedIndex != -2) {
-						listModel.remove(selectedIndex);
+						groupListModel.remove(selectedIndex);
 					}
 					ModGroup newGroup = new ModGroup(groupName);
 					for (int i = 0; i < newGroupModel.getRowCount(); i++) {
 						newGroup.add(newGroupModel.getRow(i).getCode());
 					}
-					listModel.add(newGroup);
-					config.writeModGroupFile(listModel);
+					groupListModel.add(newGroup);
+					config.writeModGroupFile(groupListModel.getList());
 					addNewGroupFrame.dispose();
 				}
 			}

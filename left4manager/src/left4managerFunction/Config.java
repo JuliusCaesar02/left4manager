@@ -18,8 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import left4managerFunction.Gui.GroupListModel;
-
 public class Config {
 	private String l4d2Dir = new String();
 	final private String l4managerDir = new String(System.getProperty("user.dir"));
@@ -105,14 +103,14 @@ public class Config {
 		return output;
 	}
 	
-	public void writeModGroupFile(GroupListModel listModel) {
+	public void writeModGroupFile(List<ModGroup> listModel) {
 		createFile("modGroup.json");
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();         
     	FileWriter fw;
 		try {
 			fw = new FileWriter(getL4managerDir() +File.separator +"json" +File.separator +"modGroup.json");
-			gson.toJson(listModel.get(), fw);
+			gson.toJson(listModel, fw);
 			fw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
