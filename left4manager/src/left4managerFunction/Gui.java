@@ -54,6 +54,10 @@ import com.google.gson.reflect.TypeToken;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
+import left4managerFunction.TableModels.GroupListTableModel;
+import left4managerFunction.TableModels.GroupModTableModel;
+import left4managerFunction.TableModels.TableRowTransferHandler;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -130,6 +134,10 @@ public class Gui {
 				default:
 					return String.class;
 				}
+			}
+			
+			public void reorder(int rowIndex, int position) {
+				extractModList.moveToIndex(rowIndex, position);
 			}
 		};
 
@@ -870,8 +878,12 @@ public class Gui {
 	public JPanel createOrderTab() {
 		JPanel mainPane = new JPanel();
 
-		DefaultTableModel model = createOrderModel();
+		GroupModTableModel model = new GroupModTableModel();
+		model.add(extractModList.getModList());
 		JTable table = new JTable(model);
+		table.setDragEnabled(true);
+	    table.setDropMode(DropMode.INSERT_ROWS);
+	    table.setTransferHandler(new TableRowTransferHandler(table));
 
 		mainPane.add(new JScrollPane(table));
 
@@ -933,139 +945,9 @@ public class Gui {
 		}
 	}
 
-	public static class GroupListTableModel extends AbstractTableModel {
+	
 
-		protected static final String[] COLUMN_NAMES = { "Name" };
-
-		private List<ModGroup> rowData;
-		private int columnCount;
-		private List<Boolean> editableRow;
-
-		public GroupListTableModel() {
-			rowData = new ArrayList<ModGroup>();
-			editableRow = new ArrayList<Boolean>();
-			this.columnCount = COLUMN_NAMES.length;
-		}
-
-		@Override
-		public boolean isCellEditable(int row, int column) {
-			return this.editableRow.get(row);
-		}
-		
-		public void setRowEditable(int row, boolean value) {
-			this.editableRow.set(row, value);
-		}
-		public void setAllRowEditable(boolean value) {
-			for(int i = 0; i < editableRow.size(); i++) {
-				this.editableRow.set(i, value);
-			}
-			
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return String.class;
-			default:
-				return String.class;
-			}
-		}
-
-		public void add(List<ModGroup> modList) {
-			for(int i = 0; i < modList.size(); i++) {
-				this.editableRow.add(false);
-			}
-			rowData.addAll(modList);
-			fireTableDataChanged();
-		}
-
-		public void add(ModGroup... pd) {
-			add(Arrays.asList(pd));
-		}
-
-		public void clear() {
-			rowData.clear();
-			fireTableDataChanged();
-		}
-
-		public void remove(int index) {
-			this.editableRow.remove(index);
-			rowData.remove(index);
-			fireTableDataChanged();
-		}
-
-		@Override
-		public int getRowCount() {
-			return rowData.size();
-		}
-
-		@Override
-		public int getColumnCount() {
-			return this.columnCount;
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			return COLUMN_NAMES[column];
-		}
-
-		public ModGroup getRow(int row) {
-			return rowData.get(row);
-		}
-
-		public List<ModGroup> getRow(int[] row) {
-			List<ModGroup> groupList = new ArrayList<>();
-			for (int i = 0; i < row.length; i++) {
-				groupList.add(getRow(row[i]));
-			}
-			return groupList;
-		}
-
-		@Override
-		public void setValueAt(Object value, int row, int column) {
-			switch (column) {
-			case 0:
-				getRow(row).setGroupName((String) value);
-				fireTableCellUpdated(row, column);
-			default:
-				break;
-			}
-		}
-		
-		public String getGroupName(int row) {
-			return rowData.get(row).getGroupName();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			ModGroup modGroup = getRow(rowIndex);
-			Object value = null;
-			switch (columnIndex) {
-			case 0:
-				value = modGroup.getGroupName();
-				break;
-			default:
-				break;
-			}
-			return value;
-		}
-
-		public void repaint() {
-			fireTableDataChanged();
-		}
-		
-		public int getIndexByModInfo(ModGroup mod) {
-			return rowData.indexOf(mod);
-		}
-		
-		public List<ModGroup> getList() {
-			return this.rowData;
-		}
-
-	}
-
-	public class CustomCellEditor extends DefaultCellEditor  implements TableCellEditor {
+	/*public class CustomCellEditor extends DefaultCellEditor  implements TableCellEditor {
 		public CustomCellEditor(JTextField textField) {
             super(textField);
         }
@@ -1079,7 +961,7 @@ public class Gui {
             }
             return c;
         }
-    }
+    }*/
 	
 	public JPanel createGroupTab() {
 		GroupModTableModel model = new GroupModTableModel();
@@ -1102,19 +984,24 @@ public class Gui {
 		column.setBackground(Color.red);
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.LINE_START;
-		c.weightx = 0.10;
+		c.weightx = 0.1;
 		c.weighty = 1;
+		c.gridx = 0; 
 		
-		JTextField editorField = new JTextField();
-		CustomCellEditor groupTableRenderer = new CustomCellEditor(editorField);
-		JTable groupListTable = new JTable(groupListModel) {
+		//JTextField editorField = new JTextField();
+		//CustomCellEditor groupTableRenderer = new CustomCellEditor(editorField);
+		JTable groupListTable = new JTable(groupListModel); /*{
 			 @Override
 	         public CustomCellEditor getCellEditor(int row, int column) {
 				 return groupTableRenderer;
 			 }
-		};
+			 @Override
+			 public void terminateEditOnFocusLost(boolean value) {
+				 
+			 }
+		};*/
 		
-		editorField.addFocusListener(new FocusAdapter() {
+		/*editorField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 TableCellEditor cellEditor = groupListTable.getCellEditor();
@@ -1141,10 +1028,11 @@ public class Gui {
                 }
                 groupListModel.setAllRowEditable(false);
             }
-        });
+        });*/
 		
 		groupListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		groupListTable.setRowSelectionInterval(0, 0);
+
 		groupListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
 				int selectionIndex = groupListTable.getSelectedRow();
@@ -1254,6 +1142,7 @@ public class Gui {
 		column.add(buttonPanel, BorderLayout.PAGE_END);
 
 		column.add(listScrollPane, BorderLayout.CENTER);
+		column.setPreferredSize(new Dimension(100, 1000));
 		groupPanel.add(column, c);
 
 		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(model);
@@ -1271,6 +1160,7 @@ public class Gui {
 		c.anchor = GridBagConstraints.LINE_END; // bottom of space
 		c.weightx = 1;
 		c.weighty = 1;
+		c.gridx = 1; 
 
 		JPanel selectAllPane = new JPanel();
 		JCheckBox selectAllCheckBox = new JCheckBox("Select all");
@@ -1488,157 +1378,6 @@ public class Gui {
 		addNewGroupFrame.add(groupNamePane);
 		addNewGroupFrame.add(tablePane);
 		addNewGroupFrame.add(buttonsPane);
-	}
-
-	public static class GroupModTableModel extends AbstractTableModel {
-
-		protected static final String[] COLUMN_NAMES = { "Name", "Code", "Author", "Enabled" };
-
-		private List<ModInfo> rowData;
-		private int columnCount;
-
-		public GroupModTableModel() {
-			rowData = new ArrayList<>();
-			this.columnCount = COLUMN_NAMES.length;
-		}
-
-		public GroupModTableModel(int columnCount) {
-			rowData = new ArrayList<>();
-			this.columnCount = columnCount;
-		}
-
-		@Override
-		public boolean isCellEditable(int row, int column) {
-			switch (column) {
-			case 0:
-			case 1:
-			case 2:
-				return false;
-			case 3:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-			case 1:
-			case 2:
-				return String.class;
-			case 3:
-				return Boolean.class;
-			default:
-				return String.class;
-			}
-		}
-
-		public void add(List<ModInfo> modList) {
-			rowData.addAll(modList);
-			fireTableDataChanged();
-		}
-
-		public void add(ModInfo... pd) {
-			add(Arrays.asList(pd));
-		}
-
-		public void clear() {
-			rowData.clear();
-			fireTableDataChanged();
-		}
-
-		/*public void remove(int[] index) {
-			for (int i = 0; i < index.length; i++) {
-				remove(index[i]);
-			}
-		}*/
-
-		public void remove(int index) {
-			rowData.remove(index);
-			fireTableDataChanged();
-		}
-
-		@Override
-		public int getRowCount() {
-			return rowData.size();
-		}
-
-		@Override
-		public int getColumnCount() {
-			return this.columnCount;
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			return COLUMN_NAMES[column];
-		}
-
-		public ModInfo getRow(int row) {
-			return rowData.get(row);
-		}
-
-		public List<ModInfo> getRow(int[] row) {
-			List<ModInfo> mods = new ArrayList<>();
-			for (int i = 0; i < row.length; i++) {
-				mods.add(getRow(row[i]));
-			}
-			return mods;
-		}
-
-		@Override
-		public void setValueAt(Object value, int row, int column) {
-			switch (column) {
-			case 0:
-			case 1:
-			case 2:
-				break;
-			case 3:
-				getRow(row).setEnabled((boolean) value);
-				fireTableCellUpdated(row, column);
-			default:
-				break;
-			}
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			ModInfo mod = getRow(rowIndex);
-			Object value = null;
-			switch (columnIndex) {
-			case 0:
-				value = mod.getName();
-				break;
-			case 1:
-				value = mod.getCode();
-				break;
-			case 2:
-				value = mod.getAuthor();
-				break;
-			case 3:
-				value = mod.getEnabled();
-				break;
-			}
-			return value;
-		}
-
-		public void repaint() {
-			fireTableDataChanged();
-		}
-		
-		public int getIndexByModInfo(ModInfo mod){
-			return rowData.indexOf(mod);
-		}
-		
-		public int getIndexByCode(String code) {
-			for(int i = 0; i < rowData.size(); i++) {
-	    		if(rowData.get(i).getCode().equals(code)) {
-	    			return i;
-	    		}
-	    	}
-			return -1;
-		}
 	}
 
 	public JPanel createTagTab() {
