@@ -361,8 +361,6 @@ public class Gui {
 		pupulateModList.execute();
 	}
 
-	   
-	
 	public JTabbedPane createTabbedPane() {
 		JPanel tab1 = new JPanel();
 		JPanel tab2 = new JPanel();
@@ -691,7 +689,6 @@ public class Gui {
 
 	public JPanel createFilterPanel(TableRowSorter<GroupModTableModel> sorter, GroupModTableModel tableModel) {
 		List<Tags> tagList = new ArrayList<Tags>();
-		List<Tags> checkedTags = new ArrayList<Tags>();
 		tagList = allTags.getAllTags();
 		boolean[][] checkedTag = new boolean[6][11];
 
@@ -708,7 +705,10 @@ public class Gui {
 		JButton applyButton = new JButton("Apply");
 		applyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				RowFilter<GroupModTableModel, Integer> primaryTagFilter = new RowFilter<GroupModTableModel, Integer>() {
+				for (boolean[] row : checkedTag)
+		            System.out.println(Arrays.toString(row));
+					
+				RowFilter<GroupModTableModel, Integer> advancedTagFilter = new RowFilter<GroupModTableModel, Integer>() {
 					@Override
 					public boolean include(Entry<? extends GroupModTableModel, ? extends Integer> entry) {
 						List<Tags> tagList = new ArrayList<Tags>();
@@ -716,28 +716,56 @@ public class Gui {
 						boolean toFilter = true;
 						GroupModTableModel model = entry.getModel();
 						ModInfo mod = model.getRow(entry.getIdentifier());
-						List<Tags> modTag = mod.getTags();
+						List<Tags> modTagList = mod.getTags();
+						System.out.println(mod.getName());
 						for (int i = 0; i < 6; i++) {
 							if (checkedTag[i][0] == true) {
-								for (int j = 0; j < modTag.size(); j++) {
-									System.out.println(
-											toFilter + modTag.get(j).getPrimaryTag() != tagList.get(i).getPrimaryTag());
-									if (modTag.get(j).getPrimaryTag().equals(tagList.get(i).getPrimaryTag())) {
+								for (int j = 0; j < modTagList.size(); j++) {
+									Tags modTag = modTagList.get(j);
+									System.out.println("searching for " +tagList.get(i));
+									System.out.println(modTag.getPrimaryTag() +"/" +tagList.get(i).getPrimaryTag());
+									System.out.println(modTag.getPrimaryTag().equals(tagList.get(i).getPrimaryTag()));
+									if (modTag.getPrimaryTag().equals(tagList.get(i).getPrimaryTag())) {
 										toFilter = true;
-									} else {
+										for(int k = 1; k < 11; k++) {
+											if(checkedTag[i][k] == true) {
+												toFilter = false;
+												System.out.println("searching for " +tagList.get(i).getSecondaryTag().get(k - 1));
+												List<String> modSecondaryTagList = modTag.getSecondaryTag();
+												for(int l = 0; l < modSecondaryTagList.size(); l++) {
+													System.out.println(modSecondaryTagList.get(l) +"/" +tagList.get(i).getSecondaryTag().get(k - 1));
+													System.out.println(modSecondaryTagList.get(l).equals(tagList.get(i).getSecondaryTag().get(k - 1)));
+													if (modSecondaryTagList.get(l).equals(tagList.get(i).getSecondaryTag().get(k - 1))) {
+														toFilter = true;
+														break;
+													}
+												}
+												if(toFilter == false) {
+													return toFilter;
+												}
+											}
+										}
+										break;
+									}
+									else {
 										toFilter = false;
-										System.out.println("[]" + toFilter);
 									}
 								}
-							}
+								System.out.println("to filter: " +toFilter);
+								System.out.println("---------------------------------------------------------");
+								if(toFilter == false) {
+									return toFilter;
+								}
+							}				
 						}
 						return toFilter;
 					}
 				};
+			
 				if (sorter.getRowFilter() != null) {
 					sorter.setRowFilter(null);
 				} else {
-					sorter.setRowFilter(primaryTagFilter);
+					sorter.setRowFilter(advancedTagFilter);
 				}
 			}
 		});
@@ -762,6 +790,9 @@ public class Gui {
 				secondaryTagItem.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
+						if(secondaryTagItem.isSelected() == true) {
+							checkedTag[k][0] = true;
+						}
 						checkedTag[k][l + 1] = secondaryTagItem.isSelected();
 					}
 				});
