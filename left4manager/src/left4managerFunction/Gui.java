@@ -401,6 +401,7 @@ public class Gui {
 		JPanel secondaryFilterPane = new JPanel();
 		secondaryFilterPane.setLayout(new BorderLayout());
 		JScrollPane filterScrollPane = new JScrollPane(createFilterPanel(sorter, model));
+		filterScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		filterScrollPane.getVerticalScrollBar().setUnitIncrement(8);
 		secondaryFilterPane.add(filterScrollPane, BorderLayout.CENTER);
 		secondaryFilterPane.setVisible(false);
@@ -690,7 +691,7 @@ public class Gui {
 	public JPanel createFilterPanel(TableRowSorter<GroupModTableModel> sorter, GroupModTableModel tableModel) {
 		List<Tags> tagList = new ArrayList<Tags>();
 		tagList = allTags.getAllTags();
-		boolean[][] checkedTag = new boolean[6][11];
+		JCheckBox[][] checkBoxMatrix = new JCheckBox[6][11];
 
 		JPanel mainPane = new JPanel();
 		mainPane.setLayout(new BorderLayout());
@@ -703,8 +704,11 @@ public class Gui {
 		JPanel row3 = new JPanel();
 		row3.setLayout(new BorderLayout());
 		JButton applyButton = new JButton("Apply");
+		
 		applyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean[][] checkedTag = checkCheckbox(checkBoxMatrix);
+				
 				for (boolean[] row : checkedTag)
 		            System.out.println(Arrays.toString(row));
 					
@@ -722,7 +726,7 @@ public class Gui {
 							if (checkedTag[i][0] == true) {
 								for (int j = 0; j < modTagList.size(); j++) {
 									Tags modTag = modTagList.get(j);
-									System.out.println("searching for " +tagList.get(i));
+									System.out.println("searching for " +tagList.get(i).getPrimaryTag());
 									System.out.println(modTag.getPrimaryTag() +"/" +tagList.get(i).getPrimaryTag());
 									System.out.println(modTag.getPrimaryTag().equals(tagList.get(i).getPrimaryTag()));
 									if (modTag.getPrimaryTag().equals(tagList.get(i).getPrimaryTag())) {
@@ -740,6 +744,8 @@ public class Gui {
 														break;
 													}
 												}
+												System.out.println("to filter: " +toFilter);
+												System.out.println("---------------------------------------------------------");
 												if(toFilter == false) {
 													return toFilter;
 												}
@@ -761,47 +767,53 @@ public class Gui {
 						return toFilter;
 					}
 				};
-			
-				if (sorter.getRowFilter() != null) {
-					sorter.setRowFilter(null);
-				} else {
-					sorter.setRowFilter(advancedTagFilter);
-				}
+				//sorter.setRowFilter(null);
+				sorter.setRowFilter(advancedTagFilter);
 			}
 		});
-		row3.add(applyButton, BorderLayout.LINE_END);
+		JButton clearButton = new JButton("Clear");
+		clearButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sorter.setRowFilter(null);
+				setCheckBoxes(checkBoxMatrix, false);
+			}
+		});
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(clearButton);
+		buttonPanel.add(applyButton);
+		row3.add(buttonPanel, BorderLayout.LINE_END);
 
 		for (int i = 0; i < tagList.size(); i++) {
 			final int k = i;
-			JCheckBox collapsableTitle = new JCheckBox(tagList.get(i).getPrimaryTag());
-			collapsableTitle.addActionListener(new ActionListener() {
+			checkBoxMatrix[i][0] = new JCheckBox(tagList.get(i).getPrimaryTag());
+			checkBoxMatrix[i][0].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					checkedTag[k][0] = collapsableTitle.isSelected();
+					setCheckBoxes(checkBoxMatrix[k]);
 				}
 			});
-			collapsableTitle.setPreferredSize(new Dimension(120, 20));
+			checkBoxMatrix[i][0].setPreferredSize(new Dimension(120, 20));
 			JPanel collapsableBody = new JPanel();
 			collapsableBody.setMinimumSize(new Dimension(120, 0));
 			collapsableBody.setLayout(new BoxLayout(collapsableBody, BoxLayout.PAGE_AXIS));
 			for (int j = 0; j < tagList.get(i).getSecondaryTag().size(); j++) {
 				final int l = j;
-				JCheckBox secondaryTagItem = new JCheckBox(tagList.get(i).getSecondaryTag().get(j));
-				secondaryTagItem.addActionListener(new ActionListener() {
+				checkBoxMatrix[i][j + 1] = new JCheckBox(tagList.get(i).getSecondaryTag().get(j));
+				checkBoxMatrix[i][j + 1].addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if(secondaryTagItem.isSelected() == true) {
-							checkedTag[k][0] = true;
+						System.out.println(checkBoxMatrix[k][l + 1].getText());
+						if(checkBoxMatrix[k][l + 1].isSelected() == true) {
+							checkBoxMatrix[k][0].setSelected(true);
 						}
-						checkedTag[k][l + 1] = secondaryTagItem.isSelected();
 					}
 				});
-				collapsableBody.add(secondaryTagItem);
+				collapsableBody.add(checkBoxMatrix[i][j + 1]);
 			}
 			if (i < 3) {
-				row1.add(createCollapsable(collapsableTitle, collapsableBody, false));
+				row1.add(createCollapsable(checkBoxMatrix[i][0], collapsableBody, false));
 			} else {
-				row2.add(createCollapsable(collapsableTitle, collapsableBody, false));
+				row2.add(createCollapsable(checkBoxMatrix[i][0], collapsableBody, false));
 			}
 		}
 		gridPane.add(row1);
@@ -809,6 +821,42 @@ public class Gui {
 		gridPane.add(row3);
 		mainPane.add(gridPane, BorderLayout.PAGE_START);
 		return mainPane;
+	}
+	
+	private void setCheckBoxes(JCheckBox checkBoxes[][], boolean checked) {
+		for(int i = 0; i < checkBoxes.length; i++) {
+			for(int j = 0; j < checkBoxes[i].length; j++) {
+				if(checkBoxes[i][j] != null) {
+					checkBoxes[i][j].setSelected(checked);
+				}
+			}
+		}
+	}
+	
+	private boolean[][] checkCheckbox(JCheckBox checkBoxes[][]){
+		boolean[][] checkedCheckboxes = new boolean[6][11];
+		for(int i = 0; i < checkBoxes.length; i++) {
+			for(int j = 0; j < checkBoxes[i].length; j++) {
+				if(checkBoxes[i][j] != null) {
+					if(checkBoxes[i][j].isSelected()) {
+						checkedCheckboxes[i][j] = true;
+					}
+				}
+			}
+		}
+		return checkedCheckboxes;
+	}
+	
+	private void setCheckBoxes(JCheckBox checkBoxes[]) {
+		System.out.println(checkBoxes[0].isSelected());
+		if(!checkBoxes[0].isSelected()) {
+			for(int j = 1; j < checkBoxes.length; j++) {
+				if(checkBoxes[j] != null) {
+					checkBoxes[j].setSelected(false);
+					System.out.println(checkBoxes[j].isSelected());
+				}
+			}
+		}	
 	}
 
 	private RowFilter<GroupModTableModel, Object> searchFilter(String text) {
@@ -1554,13 +1602,19 @@ public class Gui {
 	public JPanel createCollapsable(Component headerComponent, Component bodyComponent, boolean visible) {
 		JPanel collapsablePanel = new JPanel();
 		collapsablePanel.setLayout(new BorderLayout());
+		collapsablePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
 		JPanel content = new JPanel();
 		content.add(bodyComponent);
 		content.setVisible(visible);
 
 		JPanel header = new JPanel();
-		JButton headerButton = new JButton();
+		Icon upIcon = new ImageIcon("." + File.separator + "icon" + File.separator + "angle-up16.gif");
+		Icon downIcon = new ImageIcon("." + File.separator + "icon" + File.separator + "angle-down16.gif");
+		JToggleButton headerButton = new JToggleButton(downIcon);
+		headerButton.setSelectedIcon(upIcon);
+		headerButton.setPreferredSize(new Dimension(25, 25));
+
 		headerButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
