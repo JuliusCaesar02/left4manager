@@ -59,6 +59,7 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -643,9 +644,22 @@ public class Gui {
 		
 		mainPanel.add(modTitle);
 		mainPanel.add(tagsPanel);
+		
+		BufferedImage img = null;
 		try {
-			BufferedImage img = ImageIO.read(new File(config.getL4D2Dir() + File.separator + "left4dead2" + File.separator
+			img = ImageIO.read(new File(config.getL4D2Dir() + File.separator + "left4dead2" + File.separator
 					+ "addons" + File.separator + "workshop" + File.separator + mod.getCode() + ".jpg"));
+		} catch (IOException e1) {
+			try {
+				img = ImageIO.read(new File(config.getL4D2Dir() + File.separator + "left4dead2" + File.separator
+						+ "addons" + File.separator + mod.getCode() + ".jpg"));
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+		}
+		
+		if(img != null) {
 			double panelWidth = (frame.getSize().width/2) - 30 - scrollPaneWidth;
 			
 			BufferedImage resizedImg;
@@ -666,10 +680,8 @@ public class Gui {
 			imgLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 			imgLabel.setIcon(new ImageIcon(resizedImg));
 			descriptionPane.add(imgLabel);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
+		
 		descriptionPane.add(textDescriptionPanel);
 		mainPanel.add(rightScrollPane);
 		mainPanel.add(saveButton);
