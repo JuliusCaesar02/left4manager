@@ -374,14 +374,11 @@ public class Gui {
 	}
 
 	public JTabbedPane createTabbedPane() {
-		JPanel tab1 = new JPanel();
-		JPanel tab2 = new JPanel();
-		JPanel tab3 = new JPanel();
 		JPanel tab5 = new JPanel();
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("List", createListTab());
 		tabbedPane.add("Group", createGroupTab());
-		tabbedPane.add("Order", createOrderTab());
+		tabbedPane.add("Order", new SortingTab(extractModList.getModList()));
 		tabbedPane.add("Tag", createTagTab());
 		tabbedPane.add("Options", tab5);
 		return tabbedPane;
@@ -876,82 +873,6 @@ public class Gui {
 		rf = RowFilter.regexFilter("(?i)" + text);
 		return rf;
 	}
-
-	public JPanel createOrderTab() {
-		JPanel mainPane = new JPanel();
-
-		ModListOrderModel model = new ModListOrderModel();
-		model.add(extractModList.getModList());
-		JTable table = new JTable(model);
-		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		table.setDragEnabled(true);
-	    table.setDropMode(DropMode.INSERT_ROWS);
-	    table.setTransferHandler(new TableRowTransferHandler(table));
-
-		mainPane.add(new JScrollPane(table));
-
-		JPanel buttonPane = new JPanel();
-		JButton up = new JButton("Up");
-		up.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = table.getSelectedRows().length - 1;
-				if(index + 1 > 1) {
-					changeRowOrder(model, table.getSelectedRows(), table.getSelectedRows()[index] - 2);
-				}
-				else {
-					changeRowOrder(model, table.getSelectedRows(), table.getSelectedRows()[index] - 1);
-				}
-			}
-		});
-		buttonPane.add(up);
-
-		JButton down = new JButton("Down");
-		down.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = table.getSelectedRows().length - 1;
-				changeRowOrder(model, table.getSelectedRows(), table.getSelectedRows()[index] + 2);
-			}
-		});
-		buttonPane.add(down);
-
-		JButton top = new JButton("Top");
-		top.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				changeRowOrder(model, table.getSelectedRows(), 0);
-			}
-		});
-		buttonPane.add(top);
-
-		JButton bottom = new JButton("Bottom");
-		bottom.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				changeRowOrder(model, table.getSelectedRows(), model.getRowCount());
-			}
-		});
-		buttonPane.add(bottom);
-
-		mainPane.add(buttonPane);
-
-		return mainPane;
-		
-		}
-
-		public void changeRowOrder(ModListOrderModel model, int[]  selectedRows, int positionMoved) {
-			System.out.println(selectedRows[0] +"/" +positionMoved);
-			if (selectedRows[0] != -1 && selectedRows[0] != positionMoved) {
-				for (int i = 0; i < selectedRows.length; i++) {
-					if (positionMoved > selectedRows[i]) {
-						positionMoved--;
-						model.reorder(selectedRows[i] - i, positionMoved);
-					}
-					
-					else {
-						model.reorder(selectedRows[i], positionMoved);
-					}
-					positionMoved++;
-				}
-			}
-		}
 
 	/*public class CustomCellEditor extends DefaultCellEditor  implements TableCellEditor {
 		public CustomCellEditor(JTextField textField) {
