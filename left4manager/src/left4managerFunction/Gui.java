@@ -56,6 +56,7 @@ import com.sun.jna.platform.win32.WinReg;
 
 import left4managerFunction.TableModels.GroupListTableModel;
 import left4managerFunction.TableModels.GroupModTableModel;
+import left4managerFunction.TableModels.ModListOrderModel;
 import left4managerFunction.TableModels.TableRowTransferHandler;
 
 import java.awt.BorderLayout;
@@ -109,7 +110,8 @@ public class Gui {
 		}
 	}
 
-	public DefaultTableModel createOrderModel() {
+	//TODO Remove
+	/*public DefaultTableModel createOrderModel() {
 		DefaultTableModel model = new DefaultTableModel() {
 			private static final long serialVersionUID = 1L;
 
@@ -166,7 +168,7 @@ public class Gui {
 		}
 
 		return model;
-	}
+	}*/
 
 	public void chooseDirectoryWindow() {
 		String steamFolder = new String(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
@@ -878,9 +880,10 @@ public class Gui {
 	public JPanel createOrderTab() {
 		JPanel mainPane = new JPanel();
 
-		GroupModTableModel model = new GroupModTableModel();
+		ModListOrderModel model = new ModListOrderModel();
 		model.add(extractModList.getModList());
 		JTable table = new JTable(model);
+		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		table.setDragEnabled(true);
 	    table.setDropMode(DropMode.INSERT_ROWS);
 	    table.setTransferHandler(new TableRowTransferHandler(table));
@@ -891,7 +894,13 @@ public class Gui {
 		JButton up = new JButton("Up");
 		up.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeModOrder(table, 1);
+				int index = table.getSelectedRows().length - 1;
+				if(index + 1 > 1) {
+					changeRowOrder(model, table.getSelectedRows(), table.getSelectedRows()[index] - 2);
+				}
+				else {
+					changeRowOrder(model, table.getSelectedRows(), table.getSelectedRows()[index] - 1);
+				}
 			}
 		});
 		buttonPane.add(up);
@@ -899,7 +908,8 @@ public class Gui {
 		JButton down = new JButton("Down");
 		down.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeModOrder(table, -1);
+				int index = table.getSelectedRows().length - 1;
+				changeRowOrder(model, table.getSelectedRows(), table.getSelectedRows()[index] + 2);
 			}
 		});
 		buttonPane.add(down);
@@ -907,7 +917,7 @@ public class Gui {
 		JButton top = new JButton("Top");
 		top.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeModOrder(table, true);
+				changeRowOrder(model, table.getSelectedRows(), 0);
 			}
 		});
 		buttonPane.add(top);
@@ -915,7 +925,7 @@ public class Gui {
 		JButton bottom = new JButton("Bottom");
 		bottom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeModOrder(table, false);
+				changeRowOrder(model, table.getSelectedRows(), model.getRowCount());
 			}
 		});
 		buttonPane.add(bottom);
@@ -923,29 +933,25 @@ public class Gui {
 		mainPane.add(buttonPane);
 
 		return mainPane;
-	}
-
-	public void changeModOrder(JTable table, int positionsMoved) {
-		int finalPosition = table.convertRowIndexToModel(table.getSelectedRow()) - positionsMoved;
-		extractModList.moveToIndex(table.convertRowIndexToModel(table.getSelectedRow()), finalPosition);
-		table.setModel(createOrderModel());
-		table.setRowSelectionInterval(finalPosition, finalPosition);
-	}
-
-	public void changeModOrder(JTable table, boolean toTop) {
-		if (toTop) {
-			extractModList.moveToTop(table.convertRowIndexToModel(table.getSelectedRow()));
-			table.setModel(createOrderModel());
-			table.setRowSelectionInterval(0, 0);
-		} else {
-			extractModList.moveToBottom(table.convertRowIndexToModel(table.getSelectedRow()));
-			table.setModel(createOrderModel());
-			table.setRowSelectionInterval(extractModList.getModList().size() - 1,
-					extractModList.getModList().size() - 1);
+		
 		}
-	}
 
-	
+		public void changeRowOrder(ModListOrderModel model, int[]  selectedRows, int positionMoved) {
+			System.out.println(selectedRows[0] +"/" +positionMoved);
+			if (selectedRows[0] != -1 && selectedRows[0] != positionMoved) {
+				for (int i = 0; i < selectedRows.length; i++) {
+					if (positionMoved > selectedRows[i]) {
+						positionMoved--;
+						model.reorder(selectedRows[i] - i, positionMoved);
+					}
+					
+					else {
+						model.reorder(selectedRows[i], positionMoved);
+					}
+					positionMoved++;
+				}
+			}
+		}
 
 	/*public class CustomCellEditor extends DefaultCellEditor  implements TableCellEditor {
 		public CustomCellEditor(JTextField textField) {

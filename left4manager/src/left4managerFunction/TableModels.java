@@ -297,33 +297,136 @@ public class TableModels {
 	    	}
 			return -1;
 		}
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public static class ModListOrderModel extends AbstractTableModel {
+		private List<ModInfo> rowData;
+		protected static final String[] COLUMN_NAMES = { "Index", "Name", "Code", "Author" };
+		private int columnCount;
+
+		public ModListOrderModel() {
+			rowData = new ArrayList<>();
+			this.columnCount = COLUMN_NAMES.length;
+		}
+		
+		public void add(List<ModInfo> modList) {
+			rowData.addAll(modList);
+			fireTableDataChanged();
+		}
+
+		public void add(ModInfo... pd) {
+			add(Arrays.asList(pd));
+		}
+		
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			switch (column) {
+			case 0:
+				return true;
+			case 1:
+			case 2:
+			case 3:
+				return false;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return Integer.class;
+			case 1:
+			case 2:
+			case 3:
+				return String.class;
+			default:
+				return String.class;
+			}
+		}
+		
+		@Override
+		public void setValueAt(Object value, int row, int column) {
+			switch (column) {
+			case 0:
+				int position = (Integer) value;
+				reorder(row, position - 1);
+				fireTableDataChanged();
+			case 1:
+			case 2:
+			case 3:
+				break;
+			default:
+				break;
+			}
+		}
+		
+		public ModInfo getRow(int row) {
+			return rowData.get(row);
+		}
+		
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			ModInfo mod = getRow(rowIndex);
+			Object value = null;
+			switch (columnIndex) {
+			case 0:
+				value = rowIndex + 1;
+				break;
+			case 1:
+				value = mod.getName();
+				break;
+			case 2:
+				value = mod.getCode();
+				break;
+			case 3:
+				value = mod.getAuthor();
+				break;
+			}
+			return value;
+		}
+		
+		@Override
+		public int getRowCount() {
+			return rowData.size();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return this.columnCount;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			return COLUMN_NAMES[column];
+		}
 		
 		public void reorder(int rowIndex, int position) {
 	    	rowData.add(position, rowData.remove(rowIndex));
+			fireTableDataChanged();
 		}
+
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public static class TableRowTransferHandler extends TransferHandler {
 
-	    //private final DataFlavor localObjectFlavor = new DataFlavor(Integer.class, "Integer Row Index");
 		private final DataFlavor localObjectFlavor = new DataFlavor(String.class, "ModInfo object");
 	    private JTable table = null;
-	    private GroupModTableModel model = null;
+	    private ModListOrderModel model = null;
 
 	    public TableRowTransferHandler(JTable table) {
 	        this.table = table;
-	        this.model = (GroupModTableModel) table.getModel();
+	        this.model = (ModListOrderModel) table.getModel();
 	    }
 
 	    @Override
 	    protected Transferable createTransferable(JComponent c) {
 	        assert (c == table);
-	        /*ModInfo modInfo = model.getRow(table.getSelectedRow());
-	        String dataToTransfer = new String();
-	    	Gson gson = new GsonBuilder().create(); 	
-	    	dataToTransfer = gson.toJson(modInfo);*/
 	        String dataToTransfer = Integer.toString(table.getSelectedRow());
 	    	System.out.println(dataToTransfer);
 	        return new StringSelection(dataToTransfer);
@@ -375,9 +478,7 @@ public class TableModels {
 	                     index++;
 	                     iter++;
 	                 }
-
-	                 target.getSelectionModel().addSelectionInterval(index, index);
-
+	                 table.setRowSelectionInterval(index - rows.length, index - 1);
 	                 return true;
 	             }
 
