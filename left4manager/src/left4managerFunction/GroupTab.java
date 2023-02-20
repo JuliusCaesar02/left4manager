@@ -40,7 +40,7 @@ public class GroupTab extends JPanel {
 	Config config;
 	ExtractModList extractModList;
 	GroupModTableModel modListModel;
-	GroupListTableModel groupListModel;
+	private GroupListTableModel groupListModel;
 	ModGroupPopUp newModGroupPopUp;
 	JTable groupListTable;
 	JTable modListTable;
@@ -53,36 +53,35 @@ public class GroupTab extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
-		c.anchor = GridBagConstraints.LINE_START;
-		c.weightx = 0.1;
-		c.weighty = 1;
-		c.gridx = 0; 
-		add(new columnPanel(), c);
-		
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor = GridBagConstraints.LINE_END; // bottom of space
+		c.anchor = GridBagConstraints.LINE_END;
 		c.weightx = 1;
 		c.weighty = 1;
 		c.gridx = 1; 
 		add(new ModListPanel(), c);
+		
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.weightx = 0.1;
+		c.weighty = 1;
+		c.gridx = 0; 
+		add(new ColumnPanel(), c);
+		
 	}
 	
-	
-	public class columnPanel extends JPanel {
+	public class ColumnPanel extends JPanel {
 		
-		public columnPanel() {
+		public ColumnPanel() {
 			super();
 			setLayout(new BorderLayout());
-			groupListTable = new JTable();
 			groupListModel = new GroupListTableModel();
 			try {
-				groupListModel.add((ModGroup) config.readModGroupFile());
+				groupListModel.add(config.readModGroupFile());
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			groupListTable = new JTable(groupListModel);
 			groupListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			groupListTable.setRowSelectionInterval(0, 0);
 			groupListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 		        public void valueChanged(ListSelectionEvent event) {
 					int selectionIndex = groupListTable.getSelectedRow();
@@ -186,14 +185,16 @@ public class GroupTab extends JPanel {
 			add(buttonPanel, BorderLayout.PAGE_END);
 			add(listScrollPane, BorderLayout.CENTER);
 			setPreferredSize(new Dimension(100, 1000));
+			groupListTable.setRowSelectionInterval(0, 0);
 		}
 		
 	}
 	
-	public class ModListPanel extends JFrame {
+	public class ModListPanel extends JPanel {
 		
 		public ModListPanel() {
 			super();
+			setLayout(new BorderLayout());
 			modListModel = new GroupModTableModel();
 			modListTable = new JTable(modListModel);
 			
@@ -252,6 +253,9 @@ public class GroupTab extends JPanel {
 			});
 			addRemoveModPane.add(addModButton);
 			addRemoveModPane.add(removeModButton);
+			add(selectAllPane, BorderLayout.PAGE_START);
+			add(tableScrollPane, BorderLayout.CENTER);
+			add(addRemoveModPane, BorderLayout.PAGE_END);
 		}
 	}
 	/***
@@ -420,6 +424,14 @@ public class GroupTab extends JPanel {
 			add(tablePane);
 			add(buttonsPane);
 		}
+	}
+	
+	public GroupListTableModel getGroupListModel() {
+		return this.groupListModel;
+	}
+	
+	public void createPopUpMenu(int index) {
+		new ModGroupPopUp(index);
 	}
 }
 

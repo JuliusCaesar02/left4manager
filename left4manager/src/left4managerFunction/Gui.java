@@ -87,7 +87,7 @@ public class Gui {
 	ExtractModList extractModList;
 	UpdateModFile updateModFile;
 	AllTags allTags;
-	GroupListTableModel groupListModel = new GroupListTableModel();
+	//GroupListTableModel groupListModel = new GroupListTableModel();
 	GroupTab groupTab;
 
 	public static void main(String[] args) {
@@ -111,66 +111,6 @@ public class Gui {
 			chooseDirectoryWindow();
 		}
 	}
-
-	//TODO Remove
-	/*public DefaultTableModel createOrderModel() {
-		DefaultTableModel model = new DefaultTableModel() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				switch (column) {
-				case 0:
-					return true;
-				default:
-					return false;
-				}
-			}
-
-			@Override
-			public Class getColumnClass(int columnIndex) {
-				switch (columnIndex) {
-				case 0:
-					return String.class;
-				case 1:
-				case 2:
-					return String.class;
-				default:
-					return String.class;
-				}
-			}
-			
-			public void reorder(int rowIndex, int position) {
-				extractModList.moveToIndex(rowIndex, position);
-			}
-		};
-
-		model.addColumn("order");
-		model.addColumn("name");
-		model.addColumn("code");
-		model.addColumn("author");
-
-		model.addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent tme) {
-				if (tme.getType() == TableModelEvent.UPDATE) {
-					System.out.println(tme.getFirstRow() + tme.getColumn()
-							+ (String) model.getValueAt(tme.getFirstRow(), tme.getColumn()));
-					extractModList.moveToIndex(tme.getFirstRow(),
-							Integer.parseInt((String) model.getValueAt(tme.getFirstRow(), tme.getColumn())) - 1);
-					// TODO refresh
-				}
-			}
-		});
-
-		List<ModInfo> modList = extractModList.getModList();
-		for (int i = 0; i < modList.size(); i++) {
-			model.addRow(new Object[] { i + 1, modList.get(i).getName(), modList.get(i).getCode(),
-					modList.get(i).getAuthor() });
-		}
-
-		return model;
-	}*/
 
 	public void chooseDirectoryWindow() {
 		String steamFolder = new String(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
@@ -360,7 +300,7 @@ public class Gui {
 				frame.add(createTabbedPane());
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				loadingFrame.setVisible(false);
+				loadingFrame.dispose();
 	       }
 		}
 		
@@ -380,7 +320,7 @@ public class Gui {
 		JPanel tab5 = new JPanel();
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("List", createListTab());
-		tabbedPane.add("Group", new GroupTab(config, extractModList));
+		tabbedPane.add("Group", groupTab);
 		tabbedPane.add("Order", new SortingTab(extractModList.getModList()));
 		tabbedPane.add("Tag", createTagTab());
 		tabbedPane.add("Options", tab5);
@@ -492,12 +432,13 @@ public class Gui {
 							JMenuItem newGroupItem = new JMenuItem("New group");
 							newGroupItem.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
-									//ModGroupPopUp popup = new ModGroupPopUp(-2);
+									groupTab.createPopUpMenu(-2);
 									tablePopupMenu.removeAll();
 								}
 							});
 							addToGroupButton.add(newGroupItem);
 							addToGroupButton.addSeparator();
+							GroupListTableModel groupListModel = groupTab.getGroupListModel();
 							for (int i = 0; i < groupListModel.getRowCount(); i++) {
 								boolean exist = false;
 								for (int j = 0; j < groupListModel.getRow(i).getSize(); j++) {
@@ -925,21 +866,4 @@ public class Gui {
 		collapsablePanel.add(content, BorderLayout.LINE_START);
 		return collapsablePanel;
 	}
-
-	/*
-	 * public List<ModGroup> readModGroupFile() { List<ModGroup> groupList = new
-	 * ArrayList<ModGroup>();
-	 * 
-	 * try { Gson modGroup = new GsonBuilder().setPrettyPrinting().create();
-	 * FileReader fr = new FileReader(config.getL4managerDir() +File.separator
-	 * +"modGroup.json"); Type modGroupListType = new
-	 * TypeToken<List<ModGroup>>(){}.getType(); groupList = modGroup.fromJson(fr,
-	 * modGroupListType); System.out.println(groupList.get(0).getGroupName());
-	 * 
-	 * fr.close();
-	 * 
-	 * 
-	 * } catch (Exception e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } return groupList; }
-	 */
 }
