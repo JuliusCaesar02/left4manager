@@ -137,6 +137,9 @@ public class ExtractModList {
     	Pattern descriptionRegex = Pattern.compile("<div class=\"workshopItemDescription\" id=\"highlightContent\">(.+?)<script>", Pattern.DOTALL);
     	//System.out.println(regexParser(descriptionRegex, html));
     	result[2] = regexParser(descriptionRegex, html);
+    	Pattern removeImg = Pattern.compile("\\u003cimg[\\s\\S]*?\\u003e");
+    	Matcher removeImgMatcher = removeImg.matcher(result[2]);
+    	result[2] = removeImgMatcher.replaceAll("");
     		
     	return result;
     }

@@ -8,14 +8,18 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -28,9 +32,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableRowSorter;
 
 import left4managerFunction.TableModels.GroupListTableModel;
@@ -73,7 +81,7 @@ public class GroupTab extends JPanel {
 		public ColumnPanel() {
 			super();
 			setLayout(new BorderLayout());
-			groupListModel = new GroupListTableModel();
+			groupListModel = new GroupListTableModel(config);
 			try {
 				groupListModel.add(config.readModGroupFile());
 			} catch (IOException e1) {
@@ -81,6 +89,7 @@ public class GroupTab extends JPanel {
 				e1.printStackTrace();
 			}
 			groupListTable = new JTable(groupListModel);
+			groupListTable.setDefaultEditor(String.class, new TextFieldCellEditor());
 			groupListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			groupListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 		        public void valueChanged(ListSelectionEvent event) {
@@ -91,8 +100,6 @@ public class GroupTab extends JPanel {
 					}
 					if (groupListModel.getRowCount() > 0) {
 						List<ModInfo> newModList = new ArrayList<ModInfo>();
-						List<ModInfo> modList = extractModList.getModList();
-						System.out.println(selectionIndex);
 						ModGroup selectedGroup = groupListModel.getRow(selectionIndex);
 						for (int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
 							ModInfo singleMod = extractModList.getModInfoByCode(selectedGroup.getGroupMod(i));
@@ -147,7 +154,6 @@ public class GroupTab extends JPanel {
 									if (selectedRow < 0 | selectedRow >= groupListModel.getRowCount()) {
 										groupListTable.setRowSelectionInterval(0, 0);
 									}
-									config.writeModGroupFile(groupListModel.getList());
 								}
 							});
 				            
@@ -177,7 +183,6 @@ public class GroupTab extends JPanel {
 					if (index > 0 | index >= groupListModel.getRowCount()) {
 						groupListTable.setRowSelectionInterval(0, 0);
 					}
-					config.writeModGroupFile(groupListModel.getList());
 				}
 			});
 			buttonPanel.add(addGroup, BorderLayout.LINE_START);
@@ -404,7 +409,6 @@ public class GroupTab extends JPanel {
 							newGroup.add(newGroupModel.getRow(i).getCode());
 						}
 						groupListModel.add(newGroup);
-						config.writeModGroupFile(groupListModel.getList());
 						dispose();
 					}
 				}
@@ -432,6 +436,51 @@ public class GroupTab extends JPanel {
 	
 	public void createPopUpMenu(int index) {
 		new ModGroupPopUp(index);
+	}
+	
+	public class TextFieldCellEditor extends DefaultCellEditor {
+	    public TextFieldCellEditor() {
+	    	super(new JTextField());
+	    }
+
+	    // Retrieve e dited value
+	    @Override
+	    public Object getCellEditorValue() {
+			System.out.println("getCellEditorValue");
+			System.out.println(((JTextField) getComponent()).getText());
+	    	return ((JTextField) getComponent()).getText();
+	    }
+
+	    @Override
+	    public boolean stopCellEditing() {
+			System.out.println("stopCellEditing");
+			boolean value = super.stopCellEditing();
+			groupListModel.setRowEditable(groupListTable.getSelectedRow(), false);
+	        return value;
+	    }
+
+	    @Override
+	    public void cancelCellEditing() {
+			System.out.println("cancelCellEditing");
+			super.stopCellEditing();
+			groupListModel.setRowEditable(groupListTable.getSelectedRow(), false);
+	    }
+		@Override
+		public boolean isCellEditable(EventObject anEvent) {
+			System.out.println(groupListTable.getSelectedRow());
+
+			return groupListModel.isCellEditable(groupListTable.getSelectedRow() , 0);
+		}
+
+		@Override
+		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+			System.out.println("getTableCellEditorComponent");
+			Component textField = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+			if (isSelected) {
+				((JTextField) textField).selectAll();
+			}
+			return textField;
+		}
 	}
 }
 

@@ -23,13 +23,14 @@ public class TableModels {
 	public static class GroupListTableModel extends AbstractTableModel {
 
 		protected static final String[] COLUMN_NAMES = { "Name" };
-
+		private Config config;
 		private List<ModGroup> rowData;
 		private int columnCount;
 		private List<Boolean> editableRow;
 
-		public GroupListTableModel() {
+		public GroupListTableModel(Config config) {
 			rowData = new ArrayList<ModGroup>();
+			this.config = config;
 			editableRow = new ArrayList<Boolean>();
 			this.columnCount = COLUMN_NAMES.length;
 		}
@@ -46,7 +47,6 @@ public class TableModels {
 			for(int i = 0; i < editableRow.size(); i++) {
 				this.editableRow.set(i, value);
 			}
-			
 		}
 
 		@Override
@@ -65,6 +65,7 @@ public class TableModels {
 			}
 			rowData.addAll(modList);
 			fireTableDataChanged();
+			updateModGroupFile();
 		}
 
 		public void add(ModGroup... pd) {
@@ -74,12 +75,14 @@ public class TableModels {
 		public void clear() {
 			rowData.clear();
 			fireTableDataChanged();
+			updateModGroupFile();
 		}
 
 		public void remove(int index) {
 			this.editableRow.remove(index);
 			rowData.remove(index);
 			fireTableDataChanged();
+			updateModGroupFile();
 		}
 
 		@Override
@@ -118,6 +121,7 @@ public class TableModels {
 			default:
 				break;
 			}
+			updateModGroupFile();
 		}
 		
 		public String getGroupName(int row) {
@@ -149,7 +153,10 @@ public class TableModels {
 		public List<ModGroup> getList() {
 			return this.rowData;
 		}
-
+		
+		public void updateModGroupFile() {
+			config.writeModGroupFile(rowData);
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
