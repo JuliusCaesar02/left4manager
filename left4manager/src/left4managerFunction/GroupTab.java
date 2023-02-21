@@ -12,11 +12,14 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
@@ -41,6 +44,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableRowSorter;
 
+import left4managerFunction.Gui.CustomFrame;
 import left4managerFunction.TableModels.GroupListTableModel;
 import left4managerFunction.TableModels.GroupModTableModel;
 
@@ -202,7 +206,9 @@ public class GroupTab extends JPanel {
 			setLayout(new BorderLayout());
 			modListModel = new GroupModTableModel();
 			modListTable = new JTable(modListModel);
-			
+			modListTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+			modListTable.getColumnModel().getColumn(1).setPreferredWidth(50);
+			modListTable.getColumnModel().getColumn(3).setPreferredWidth(30);
 			TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(modListModel);
 			modListTable.setRowSorter(sorter);
 			modListTable.setShowGrid(false);
@@ -273,15 +279,21 @@ public class GroupTab extends JPanel {
 		GroupModTableModel allModModel;
 		GroupModTableModel newGroupModel;
 		public ModGroupPopUp(int selectedIndex) {
-			super();  
+			super("L4M: Add new group");  
+			try {
+				BufferedImage icon = ImageIO.read(new File(config.getL4managerDir() +File.separator +"icon" +File.separator +"icon.png"));
+				this.setIconImage(icon);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			allModModel = new GroupModTableModel(1);
 			newGroupModel = new GroupModTableModel(1);
-			setTitle("Add new group");
-			setVisible(true);
 			setBounds(0, 0, 800, 500);
 			setLocationRelativeTo(null);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
+			setVisible(true);
 
 			JPanel groupNamePane = new JPanel();
 			groupNamePane.setLayout(new BorderLayout());
@@ -447,8 +459,10 @@ public class GroupTab extends JPanel {
 	    @Override
 	    public Object getCellEditorValue() {
 			System.out.println("getCellEditorValue");
-			System.out.println(((JTextField) getComponent()).getText());
-	    	return ((JTextField) getComponent()).getText();
+			String text = ((JTextField) getComponent()).getText();
+			System.out.println(text);
+
+			return text;
 	    }
 
 	    @Override

@@ -1,10 +1,16 @@
 package left4managerFunction;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -27,32 +33,43 @@ public class SortingTab extends JPanel {
 		orderTable = new JTable(orderModel);
 		orderTable.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		orderTable.setDragEnabled(true);
+		orderTable.setShowVerticalLines(false);
 		orderTable.setDropMode(DropMode.INSERT_ROWS);
 		orderTable.setTransferHandler(new TableRowTransferHandler(orderTable));
+		setLayout(new BorderLayout());
 		
-		add(new JScrollPane(orderTable));
+		add(new JScrollPane(orderTable), BorderLayout.CENTER);
 		
 		ButtonTab buttonTab = new ButtonTab();
-		add(buttonTab);
+		buttonTab.setBackground(Color.RED);
+		add(buttonTab, BorderLayout.LINE_END);
 	}
 	
 	public class ButtonTab extends JPanel{
 		public ButtonTab() {
 			super();
+			setPreferredSize(new Dimension(250, 1000));
+			setLayout(new GridLayout(4, 1));
 			JButton up = new JButton("Up");
 			up.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					int index = orderTable.getSelectedRows().length - 1;
-					System.out.println(orderTable.getSelectedRows()[index] - 2);
-					changeRowOrder(orderTable.getSelectedRows(), orderTable.getSelectedRows()[0] - 1);
+					int[] selectedRows = orderTable.getSelectedRows();
+					if(selectedRows[0] > 0) {
+						int index = selectedRows.length - 1;
+						System.out.println(selectedRows[index] - 2);
+						changeRowOrder(selectedRows, selectedRows[0] - 1);
+					}
 				}
 			});
 			add(up);
 			JButton down = new JButton("Down");
 			down.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					int index = orderTable.getSelectedRows().length - 1;
-					changeRowOrder(orderTable.getSelectedRows(), orderTable.getSelectedRows()[index] + 2);
+					int[] selectedRows = orderTable.getSelectedRows();
+					int index = selectedRows.length - 1;
+					if(selectedRows[index] < orderTable.getRowCount() - 1) {
+						changeRowOrder(selectedRows, selectedRows[index] + 2);
+					}
 				}
 			});
 			add(down);

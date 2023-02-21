@@ -118,11 +118,7 @@ public class Gui {
 		File l4d2Folder = new File(steamFolder + File.separator + "steamapps" + File.separator + "common"
 				+ File.separator + "Left 4 Dead 2" + File.separator);
 
-		JFrame chooseDirectory = new JFrame("Choose directory");
-		chooseDirectory.setVisible(true);
-		chooseDirectory.setBounds(0, 0, 500, 150);
-		chooseDirectory.setLocationRelativeTo(null);
-		chooseDirectory.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		CustomFrame chooseDirectory = new CustomFrame("L4M: Choose directory");
 		JPanel mainContainer = new JPanel();
 		JPanel directoryBox = new JPanel();
 
@@ -174,12 +170,13 @@ public class Gui {
 				fileChooserWindow(defaultFolder, input);
 			}
 		});
+		chooseDirectory.setVisible(true);
 	}
 
 	public void fileChooserWindow(File defaultFolder, JTextField input) {
 		JFileChooser fileChooser = new JFileChooser();
 
-		fileChooser.setDialogTitle("Choose Left 4 Dead 2 directory");
+		fileChooser.setDialogTitle("L4M: Choose Left 4 Dead 2 directory");
 		fileChooser.setCurrentDirectory(defaultFolder);
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		// fileChooserFrame.add(fileChooser);
@@ -200,10 +197,7 @@ public class Gui {
 		allTags = new AllTags(config);
 		extractModList = new ExtractModList(config);
 		
-		JFrame loadingFrame = new JFrame("Mod info loading");
-		loadingFrame.setBounds(200, 200, 500, 150);
-		loadingFrame.setLocationRelativeTo(null);
-		loadingFrame.setVisible(true);
+		CustomFrame loadingFrame = new CustomFrame("L4M: Mod info loading");
 		loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
@@ -225,6 +219,7 @@ public class Gui {
 		mainPanel.add(labelPanel);
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		loadingFrame.add(mainPanel);
+		loadingFrame.setVisible(true);
 		
 		class PopulateModList extends SwingWorker<Void, Double> {	
 			@Override
@@ -285,21 +280,11 @@ public class Gui {
 			
 			@Override
 			protected void done() {
-				frame = new JFrame("Left4Manager");
-				BufferedImage icon;
-				try {
-					System.out.println(config.getL4D2Dir() +File.separator +"icon" +File.separator +"icon.jpg");
-					icon = ImageIO.read(new File(config.getL4managerDir() +File.separator +"icon" +File.separator +"icon.png"));
-					frame.setIconImage(icon);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				frame = new CustomFrame("Left4Manager");
 				frame.setBounds(200, 200, 1080, 720);
-				frame.setLocationRelativeTo(null);
 				frame.add(createTabbedPane());
-				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setVisible(true);
 				loadingFrame.dispose();
 	       }
 		}
@@ -338,6 +323,9 @@ public class Gui {
 		GroupModTableModel model = new GroupModTableModel();
 		model.add(extractModList.getModList());
 		JTable table = new JTable(model);
+		table.getColumnModel().getColumn(0).setPreferredWidth(200);
+		table.getColumnModel().getColumn(1).setPreferredWidth(50);
+		table.getColumnModel().getColumn(3).setPreferredWidth(30);
 		TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(model);
 		JTextField searchFilterText = new JTextField();
 		searchFilterText.setMaximumSize(new Dimension(1000, 50));
@@ -865,5 +853,21 @@ public class Gui {
 		collapsablePanel.add(header, BorderLayout.PAGE_START);
 		collapsablePanel.add(content, BorderLayout.LINE_START);
 		return collapsablePanel;
+	}
+	
+	public class CustomFrame extends JFrame {
+		CustomFrame(String frameTitle){
+			super(frameTitle);
+			try {
+				BufferedImage icon = ImageIO.read(new File(config.getL4managerDir() +File.separator +"icon" +File.separator +"icon.png"));
+				this.setIconImage(icon);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			setBounds(0, 0, 500, 150);
+			setLocationRelativeTo(null);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		}
 	}
 }
