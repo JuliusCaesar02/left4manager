@@ -27,6 +27,11 @@ import java.util.regex.Pattern;
 
 import javax.swing.JProgressBar;
 
+import com.connorhaigh.javavpk.core.Archive;
+import com.connorhaigh.javavpk.core.ArchiveEntry;
+import com.connorhaigh.javavpk.core.Directory;
+import com.connorhaigh.javavpk.exceptions.ArchiveException;
+import com.connorhaigh.javavpk.exceptions.EntryException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -280,6 +285,55 @@ public class ExtractModList {
         	e.printStackTrace();
         }
     	return true;
+    }
+    
+    public ModInfo getObjectFromVPK(String code) {
+    	String[] objectInfo = null;
+		File vpkArchiveFile = new File(addonsPath +"addons" +File.separator +"workshop" +File.separator +code +".vpk");
+		Archive vpkArchive = null;
+
+		try {
+			vpkArchive = new Archive(vpkArchiveFile);
+		} catch (ArchiveException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			vpkArchive.load();
+		} catch (IOException | ArchiveException | EntryException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+		for (Directory directory : vpkArchive.getDirectories())
+			for (ArchiveEntry entry : directory.getEntries())
+				if(entry.getFullName().equals("addoninfo.txt")) {
+					try {
+						byte[] bytes = entry.readData();
+						String content = new String(bytes, StandardCharsets.UTF_8);
+						System.out.println(content);
+						objectInfo = parseAddonFileInfo(content);
+					} catch (IOException | ArchiveException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+		System.out.println(objectInfo[0]+"/"+ code+"/"+ objectInfo[1]+"/"+ objectInfo[2]);
+		return new ModInfo(objectInfo[0], code, objectInfo[1], objectInfo[2], null, false);
+    }
+    
+    public String[] parseAddonFileInfo(String text) {
+    	String[] result = new String[3];
+    	Pattern titleRegex = Pattern.compile("addontitle\\s*\"([\\S\\s]*?)\\\"", Pattern.CASE_INSENSITIVE);
+    	result[0] = regexParser(titleRegex, text);
+    	
+    	Pattern authorRegex = Pattern.compile("addonauthor\\s*\"([\\S\\s]*?)\\\"", Pattern.CASE_INSENSITIVE);
+    	result[1] = regexParser(authorRegex, text);
+    	
+    	Pattern descriptionRegex = Pattern.compile("addonDescription\\s*\"([\\S\\s]*?)\\\"", Pattern.CASE_INSENSITIVE);
+    	result[2] = regexParser(descriptionRegex, text);
+    	
+		return result;
     }
     
     /*public void runScript(String code, Config config) {

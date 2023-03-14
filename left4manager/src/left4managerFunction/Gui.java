@@ -2,83 +2,46 @@ package left4managerFunction;
 
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.LayoutManager2;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EventObject;
 import java.util.List;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
-import java.net.SocketException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import javax.swing.table.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.connorhaigh.javavpk.core.Archive;
+import com.connorhaigh.javavpk.core.ArchiveEntry;
+import com.connorhaigh.javavpk.core.Directory;
+import com.connorhaigh.javavpk.exceptions.ArchiveException;
+import com.connorhaigh.javavpk.exceptions.EntryException;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
-import left4managerFunction.GroupTab.ModGroupPopUp;
 import left4managerFunction.TableModels.GroupListTableModel;
 import left4managerFunction.TableModels.GroupModTableModel;
-import left4managerFunction.TableModels.ModListOrderModel;
-import left4managerFunction.TableModels.TableRowTransferHandler;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.HyperlinkListener;
+import javax.swing.RowFilter.Entry;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.*;
 
 public class Gui {
 
@@ -240,10 +203,11 @@ public class Gui {
 				String modName = "";
 				for(int i = 0; i < l4d2ModList.size(); i++) {
 					ModInfo singleMod = l4d2ModList.get(i);
+					boolean enabled = singleMod.getEnabled();
 					try {
 						ModInfo objectFromJson = extractModList.getObjectFromJson(singleMod.getCode());
 						System.out.println("Mod found in json");
-						objectFromJson.setEnabled(singleMod.getEnabled());
+						objectFromJson.setEnabled(enabled);
 						extractModList.getModList().add(objectFromJson);	
 						modName = objectFromJson.getName();
 						System.out.println(objectFromJson.getName());
@@ -259,7 +223,9 @@ public class Gui {
 						} catch(IOException f) {
 							System.out.println("No internet");
 							headerLabel.setText("No internet connection");
-							extractModList.getModList().add(l4d2ModList.get(i));
+							singleMod = extractModList.getObjectFromVPK(singleMod.getCode());
+							singleMod.setEnabled(enabled);
+							extractModList.getModList().add(singleMod);
 						}
 					}
 					totalProgress += progress;
@@ -525,17 +491,20 @@ public class Gui {
 		tagsPanel.setLayout(new BoxLayout(tagsPanel, BoxLayout.PAGE_AXIS));
 		
 		List<Tags> modTag = mod.getTags();
-		for(int i = 0; i < modTag.size(); i++) {
-			Tags singleModTag = modTag.get(i);
-			JPanel singleModPanel = new JPanel();
-			JLabel primaryTagLabel = new JLabel("<html>" +"<B>" +singleModTag.getPrimaryTag() +"</B>" +" -" +"</html>");
-			List<String> secondaryTagList = singleModTag.getSecondaryTag();
-			singleModPanel.add(primaryTagLabel);
-			for(int j = 0; j < secondaryTagList.size(); j++) {
-				JLabel secondaryTagLabel = new JLabel(secondaryTagList.get(j));
-				singleModPanel.add(secondaryTagLabel);
+		try {
+			for(int i = 0; i < modTag.size(); i++) {
+				Tags singleModTag = modTag.get(i);
+				JPanel singleModPanel = new JPanel();
+				JLabel primaryTagLabel = new JLabel("<html>" +"<B>" +singleModTag.getPrimaryTag() +"</B>" +" -" +"</html>");
+				List<String> secondaryTagList = singleModTag.getSecondaryTag();
+				singleModPanel.add(primaryTagLabel);
+				for(int j = 0; j < secondaryTagList.size(); j++) {
+					JLabel secondaryTagLabel = new JLabel(secondaryTagList.get(j));
+					singleModPanel.add(secondaryTagLabel);
+				}
+				tagsPanel.add(singleModPanel);
 			}
-			tagsPanel.add(singleModPanel);
+		} catch (Exception e1) {
 		}
 		
 		JPanel descriptionPane = new JPanel();

@@ -10,14 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class TableModels {
 	public static class GroupListTableModel extends AbstractTableModel {

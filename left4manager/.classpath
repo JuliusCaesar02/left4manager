@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="C:/Users/Caesar/Downloads/gson-2.6.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Caesar/Downloads/jna-platform-5.12.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Caesar/Downloads/jna-5.12.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Caesar/Downloads/JavaVPK-1.2.2/JavaVPK-1.2.2rebuild.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -2,7 +2,6 @@ package left4managerFunction;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
@@ -10,15 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.BoxLayout;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.AbstractTableModel;
-
 import left4managerFunction.TableModels.ModListOrderModel;
 import left4managerFunction.TableModels.TableRowTransferHandler;
 
