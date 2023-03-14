@@ -1,0 +1,1881 @@
+[
+  {
+    "name": "Optimus Prime-Truck",
+    "code": "1099517727",
+    "author": "Floh",
+    "description": "Replaces the Longnose- and Semi3-Truck with the Optimus Prime-Truck (Transformers)",
+    "enabled": false
+  },
+  {
+    "name": "RNG Cola Bottles",
+    "code": "1104688008",
+    "author": "Tr!cky",
+    "description": "6 Cola Bottles",
+    "enabled": false
+  },
+  {
+    "name": "Witch Rasputin",
+    "code": "1122383379",
+    "author": "TheAaron32G",
+    "description": "Replaces the music when the witch is near RARARASPUTIN",
+    "enabled": false
+  },
+  {
+    "name": "Vanilla For Rochelle(Nekopara)",
+    "code": "1138710165",
+    "author": "Peakness Yang",
+    "description": "Replaces Rochelle",
+    "enabled": false
+  },
+  {
+    "name": "ToyZ 3",
+    "code": "1142571737",
+    "author": "Mogabi",
+    "description": ". Get source files and tools for creating your own campaigns by downloading the Left 4 Dead Authoring tools SDK, which is available under the \u0027Tools\u0027 tab in Steam.",
+    "enabled": false
+  },
+  {
+    "name": "Team Health Counter",
+    "code": "121088866",
+    "author": "Rayman1103",
+    "description": "Adds a health counter for Survivor teammates. Now you can see how much health they actually have in numbers.",
+    "enabled": false
+  },
+  {
+    "name": "Left 4 Comrade: Soviet Union Flag",
+    "code": "1221088651",
+    "author": "Comrade",
+    "description": "Soviet Union Flag.",
+    "enabled": false
+  },
+  {
+    "name": "\t\t",
+    "code": "1238023804",
+    "author": "\t\t",
+    "description": "\t",
+    "enabled": false
+  },
+  {
+    "name": "Halo 3 ODST Genet Police cars (Police cars)",
+    "code": "1239887244",
+    "author": "Danger Wasp",
+    "description": "Replaces all Police Cars in L4D2 with the Police variant of the HuCiv Genet from Halo 3 ODST.",
+    "enabled": false
+  },
+  {
+    "name": "DeLorean DMC-12 Time Machine",
+    "code": "1240091974",
+    "author": "MrFunreal",
+    "description": "Replaces Jimmys car with the DeLorean",
+    "enabled": false
+  },
+  {
+    "name": "Argus - PS",
+    "code": "1242213955",
+    "description": "If you can read this, that means that either you downloaded it from somewhere else or you are trying to open VPK file. Please do not use that VPK file and download original addon from here: http://steamcommunity.com/id/abjecttree57929/myworkshopfiles/?appid\u003d550 .",
+    "enabled": false
+  },
+  {
+    "name": "Argus sound",
+    "code": "1242794800",
+    "author": "Mew Mew-Chan",
+    "description": "Argus sound mod to replace pump shotgun",
+    "enabled": false
+  },
+  {
+    "name": "                       ",
+    "code": "1252177390",
+    "author": "                      ",
+    "description": "                 ",
+    "enabled": true
+  },
+  {
+    "name": "Honoka V slingshot bikini RNG(hunter)",
+    "code": "1268841922",
+    "author": "ͽ�ֿ�����genhao",
+    "description": " \r\nProfessional students come from TECMO\u0027s game ",
+    "enabled": false
+  },
+  {
+    "name": "Heineken Molotov Cocktail",
+    "code": "127167490",
+    "author": "Miztaegg",
+    "description": "Heineken Molotov Cocktail",
+    "enabled": false
+  },
+  {
+    "name": "Table Tennis Racket (Frying Pan)",
+    "code": "127491605",
+    "author": "Yogensia",
+    "description": "Replaces Frying Pan with a table tennis paddle.",
+    "enabled": true
+  },
+  {
+    "name": "LaserMax Laser Sights",
+    "code": "128005925",
+    "author": "miztaegg",
+    "description": "First Shot Confidence!",
+    "enabled": false
+  },
+  {
+    "name": "Detailed Rusty Jerrycans, Propane and Oxygen Tanks",
+    "code": "130033528",
+    "author": "Miztaegg",
+    "description": "Detailed Rusty Jerrycans, Propane and Oxygen Tanks",
+    "enabled": false
+  },
+  {
+    "name": "DOOM Chaingun (M60)",
+    "code": "1312354014",
+    "author": "Aven",
+    "description": "M60",
+    "enabled": false
+  },
+  {
+    "name": "Steins;Gate  Soda machine",
+    "code": "134882477",
+    "author": "THOR",
+    "description": "SODA Machine Otaku, Steins;Gate",
+    "enabled": false
+  },
+  {
+    "name": "The Professional Scope",
+    "code": "136694569",
+    "author": "Red Schism",
+    "description": "Replaces the Sniper Scope sights with a highly detailed alternative featuring an Optical ",
+    "enabled": false
+  },
+  {
+    "name": "Touhou 18+ V Machine ",
+    "code": "1379069712",
+    "author": "Akyuun",
+    "description": "Touhou... Touhou.. Touhou Everywhere.... Let\u0027s Make All of them Praise The ZUN",
+    "enabled": false
+  },
+  {
+    "name": "Wurlitzer Jukebox",
+    "code": "1465215328",
+    "author": "MrFunreal",
+    "description": "Replaces the Jukebox.",
+    "enabled": false
+  },
+  {
+    "name": "White Medical Cabinet with glass",
+    "code": "1472110503",
+    "author": "MrFunreal",
+    "description": "Replaces the medical cabinet with a vwhite versio nthat has glass.",
+    "enabled": false
+  },
+  {
+    "name": "Defibrillator bag",
+    "code": "1494274936",
+    "author": "Ramm.asmiette",
+    "description": "Defibrillator bag",
+    "enabled": false
+  },
+  {
+    "name": "tv_simpsons hvp",
+    "code": "150855697",
+    "author": "K1CHWA",
+    "description": "tv_simpsons hvp",
+    "enabled": false
+  },
+  {
+    "name": "DMM Rebel Ice Axe (Crowbar)",
+    "code": "159491028",
+    "author": "Yogensia",
+    "description": "Replaces Crowbar with with a DMM Rebel ice axe.",
+    "enabled": false
+  },
+  {
+    "name": "Gnome \u003d\u003e Big Chungus",
+    "code": "1628789102",
+    "author": "ErichGrooms1",
+    "description": "That\u0027ll hold\u0027em alright, hehehehehehe! Phooey!",
+    "enabled": false
+  },
+  {
+    "name": "Phoneowave",
+    "code": "1636526632",
+    "author": "Kyōma Hōōin",
+    "description": "Future Gadget #8",
+    "enabled": false
+  },
+  {
+    "name": "Improved Art",
+    "code": "165916861",
+    "author": "jules_cools",
+    "description": "Improved Art.",
+    "enabled": false
+  },
+  {
+    "name": "Ghostrider\u0027s Chain",
+    "code": "1682200728",
+    "author": "Tanerseto",
+    "description": "DE: Ersetzt den Riot Shield, Schuldig jetzt müssen Die Zombies brennen ;)\r\n\t\t\t\t\t\t\t  EN: Replaces the Riot Shield Guilty now must burn the Zombies ;)",
+    "enabled": false
+  },
+  {
+    "name": "Explosive Ammo Chia",
+    "code": "1737329813",
+    "author": "NAVY",
+    "description": "Explosive Ammo from the Chia Series.",
+    "enabled": false
+  },
+  {
+    "name": "Incendiary Ammo Chia",
+    "code": "1737521676",
+    "author": "NAVY",
+    "description": "Incendiary Ammo from the Chia Series.",
+    "enabled": false
+  },
+  {
+    "name": "Miami Biker replaces Francis",
+    "code": "1779569184",
+    "author": "Chase/Scout_115",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "Snack Machine",
+    "code": "179471991",
+    "author": "Bukethead/fdsman",
+    "description": "High res vending machine snacks texture",
+    "enabled": false
+  },
+  {
+    "name": "【20Cat】Star Particle for Tank",
+    "code": "1910677185",
+    "author": "20Cat",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "\t\t",
+    "code": "1912215523",
+    "author": "\t\t",
+    "description": "\t",
+    "enabled": false
+  },
+  {
+    "name": "Apex Legends - Triple Take",
+    "code": "1912513163",
+    "author": "Twilight Sparkle/Respawn/Punk buster",
+    "description": "hi",
+    "enabled": false
+  },
+  {
+    "name": "Default Dance Tank Victory",
+    "code": "1919726251",
+    "author": "trigger_hurt",
+    "description": "h",
+    "enabled": false
+  },
+  {
+    "name": "OBAMADOOR",
+    "code": "1933251653",
+    "author": "ObamaGaming",
+    "description": "OBAMA DOOR",
+    "enabled": false
+  },
+  {
+    "name": "MIKU Reaver [Auto Shotgun]",
+    "code": "1965549113",
+    "author": "SF",
+    "description": "Reaver [Auto Shotgun]",
+    "enabled": true
+  },
+  {
+    "name": "LOLI MALL",
+    "code": "1976156822",
+    "author": "ElTitoDan",
+    "description": "Cute art only.",
+    "enabled": false
+  },
+  {
+    "name": "CSO2 M99_ss",
+    "code": "2026203857",
+    "author": "尼克LEON",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic",
+    "code": "2031028789",
+    "author": "Fugger",
+    "description": "Bad Maps",
+    "enabled": true
+  },
+  {
+    "name": "Glubtastic 2",
+    "code": "2066106924",
+    "author": "Fugger",
+    "description": "Even more Bad Maps",
+    "enabled": true
+  },
+  {
+    "name": "Zombies (PvZ:GW) replace CI",
+    "code": "2085506920",
+    "author": "Cow",
+    "description": "After Louis as a zombies, obviously there should be a mod that replace commons as zombies from PvZ Garden Warfare",
+    "enabled": false
+  },
+  {
+    "name": "Shrek The Tank",
+    "code": "210368756",
+    "author": "MasterGir",
+    "description": "Shrek\u0027s head on a Tank",
+    "enabled": false
+  },
+  {
+    "name": "CSO2 tomahawk",
+    "code": "2114349888",
+    "author": "尼克LEON",
+    "description": "CSO2 tomahawk replace for the machete.",
+    "enabled": false
+  },
+  {
+    "name": "Steins;Gate Death Music",
+    "code": "211899851",
+    "author": "alexander1685",
+    "description": "Farewell theme from Steins;Gate replaces death theme",
+    "enabled": false
+  },
+  {
+    "name": "CODOL_Fate",
+    "code": "2127886641",
+    "author": "尼克leon",
+    "description": "CODOL_Fate replace the ak47",
+    "enabled": true
+  },
+  {
+    "name": "Outrun",
+    "code": "2134975310",
+    "author": "Mogabi",
+    "description": "The Survivors have awoken in a mysterious place, now they must traverse the bizzare lego dimension and all of the obstacles that it has to offer before escaping.",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic 3",
+    "code": "2139756699",
+    "author": "Fugger",
+    "description": "Even more Bad Maps",
+    "enabled": true
+  },
+  {
+    "name": "HUD 701",
+    "code": "2163110492",
+    "author": "SHRIMP",
+    "description": "THIS IS A TEST",
+    "enabled": false
+  },
+  {
+    "name": "submarine",
+    "code": "2163774681",
+    "author": "oguzhan",
+    "description": "submarine",
+    "enabled": false
+  },
+  {
+    "name": "Remove Explosion Flash",
+    "code": "2165823958",
+    "author": "Lulin",
+    "enabled": true
+  },
+  {
+    "name": "Monica (Dealer)(DOAXV) {Replaces Zoey}",
+    "code": "2167149164",
+    "author": "Cassie",
+    "description": "Monica (Dealer)(DOAXV) {Replaces Zoey}",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Overlay",
+    "code": "2189358004",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Escape Vehicles",
+    "code": "2189391054",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Infected",
+    "code": "2189396300",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Skybox",
+    "code": "2189405704",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Vehicles",
+    "code": "2189409705",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Doors",
+    "code": "2189414528",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Items",
+    "code": "2189419829",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Sound, Ragdolls \u0026 Water",
+    "code": "2189441393",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - RNG",
+    "code": "2189446707",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "Smoker\u0027s Smoke Weed Everyday Death Sound",
+    "code": "219041763",
+    "author": "Gilboron",
+    "description": "Replaces the Smoker death sound with Snoop Dogg\u0027s \u0027Smoke Weed Everyday\u0027",
+    "enabled": false
+  },
+  {
+    "name": "Candy Ammo Pile",
+    "code": "220883704",
+    "author": "Sprinklez",
+    "description": "A variety of candy boxes ranging from sweet to totally awesome. Who needs ammunition when you\u0027ve got perfectly un-expired confectionary.",
+    "enabled": false
+  },
+  {
+    "name": "Witch Parade [Mutation]",
+    "code": "2212135654",
+    "author": "Solved",
+    "description": "To much Broomsticks to handle!",
+    "enabled": false
+  },
+  {
+    "name": "Among Us (Gnome)",
+    "code": "2235544107",
+    "author": "oguzhan",
+    "description": "Among Us Red",
+    "enabled": false
+  },
+  {
+    "name": "BONK! sounds for shovel",
+    "code": "2238059300",
+    "author": "V-Synth",
+    "description": "BONK!",
+    "enabled": false
+  },
+  {
+    "name": "Shovel Blade over Shovel",
+    "code": "2240386679",
+    "author": "Majro",
+    "description": "A shovel over a shovel. What a concept.",
+    "enabled": false
+  },
+  {
+    "name": "SB Witch Execution",
+    "code": "225108851",
+    "author": "Swooping Bears",
+    "description": "First and only witch crowning training map, that will not just put you in a room with a witch and a shotgun (meh), but show where and when exactly you have to shoot that bitch for 100% crowning in every possible situation.",
+    "enabled": false
+  },
+  {
+    "name": "Aquaman\u0027s Trident",
+    "code": "2251494977",
+    "author": "Iconoclast x nothing ( STEAM_0:1:561667204 x STEAM_0:1:33451111 )",
+    "description": "Replaces the pitchfork with Aquaman\u0027s Trident, please don\u0027t sue us",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA Main Menu Buttons",
+    "code": "2256147202",
+    "author": "MrFunreal",
+    "description": "adds TUMTaRA loading buttons to the main menu. also moves blog post",
+    "enabled": false
+  },
+  {
+    "name": "Jacket (Ellis)",
+    "code": "2256176946",
+    "author": "Salad",
+    "description": "Do you know what time it is? Replaces Ellis with PAYDAY 2\u0027s rendition of Jacket from Hotline Miami.",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA - Survivors",
+    "code": "2263388642",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "ToyZ 4",
+    "code": "2287567972",
+    "author": "Mogabi",
+    "description": ". Get source files and tools for creating your own campaigns by downloading the Left 4 Dead Authoring tools SDK, which is available under the \u0027Tools\u0027 tab in Steam.",
+    "enabled": false
+  },
+  {
+    "name": "Tda Akita Neru Append (v2)",
+    "code": "234179589",
+    "author": "CaptainBigButt",
+    "description": "Francis Replacement",
+    "enabled": false
+  },
+  {
+    "code": "2406154389",
+    "enabled": false
+  },
+  {
+    "name": "Pokeball.",
+    "code": "241776737",
+    "author": "IRIS",
+    "description": "The pokeball from Pokemon replaces the vomitjar. Model and Textures: Rafael De Jongh. Compile, Ported and Rigged: IRIS",
+    "enabled": false
+  },
+  {
+    "name": "Tda Kasane Teto Append (v2)",
+    "code": "242266504",
+    "author": "CaptainBigButt",
+    "description": "Louis Replacement",
+    "enabled": false
+  },
+  {
+    "name": "There Finger Bang",
+    "code": "242981806",
+    "author": "Splinks",
+    "description": "replacement for The Magnum",
+    "enabled": false
+  },
+  {
+    "name": "Rick Astley Defib",
+    "code": "244772417",
+    "author": "Anfrien",
+    "description": "Replaces the Defib sounds to Never Gonna Give you up by Rick Astley.",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic 4",
+    "code": "2459037122",
+    "author": "Fugger",
+    "description": "This needs to stop",
+    "enabled": true
+  },
+  {
+    "name": "Hunter Candia",
+    "code": "2485377489",
+    "author": "[Me]",
+    "description": "[Test]",
+    "enabled": false
+  },
+  {
+    "name": "Tda Yowane Haku Append (v2)",
+    "code": "249601409",
+    "author": "CaptainBigButt",
+    "description": "Bill Replacement",
+    "enabled": false
+  },
+  {
+    "name": "Titanfall C.A.R. SMG",
+    "code": "249662952",
+    "author": "Twilight Sparkle/Valve/Respawn/HyperMetal",
+    "description": "A replace for the Silenced SMG using the C.A.R. SMG know now more as (Combat Advanced Round Submachine Gun) from Titanfall with its original animations",
+    "enabled": false
+  },
+  {
+    "name": "- Pipe Bobomb -",
+    "code": "253436034",
+    "author": "Emperor Doom",
+    "description": "Bob-ombs are living, moving mechanical bombs with eyes, feet, and a wind-up key in the back. They are generic enemies who first appeared in Super Mario Bros. 2, and have appeared in nearly every Mario game since then. Their appearance, intelligence, and status in relation to Mario differ widely from game to game. They are usually either blue or black, but some variations are pink or red. They will also flash red and sometimes make beeping sounds if they are about to explode.",
+    "enabled": false
+  },
+  {
+    "name": "Titanfall Smart Pistol MK5",
+    "code": "254071513",
+    "author": "Twilight Sparkle/Arby26",
+    "description": "A replace for the Single Pistol and the dual pistols using the Smart Pistol MK5 and the Hammond P2011 from Titanfall",
+    "enabled": false
+  },
+  {
+    "name": "Red (Movie) (Nick)",
+    "code": "2549183331",
+    "author": "NootTheSpriter",
+    "description": "Replaces Nick",
+    "enabled": false
+  },
+  {
+    "name": "SVD Dragunov Sniper Rifle",
+    "code": "256852245",
+    "author": "Lt. Rocky",
+    "description": "Seph\u0027s SVD Dragunov; Replaces the Military Sniper on Arby\u0027s Zatsava animations",
+    "enabled": false
+  },
+  {
+    "name": "PDTH Style HUD",
+    "code": "2793070379",
+    "author": "AUTHOR_NAME",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic: Back 4 Glub",
+    "code": "2795386618",
+    "author": "Fugger",
+    "description": "British",
+    "enabled": true
+  },
+  {
+    "name": "Ruby Rose\u0027s Crescent Rose Fireaxe",
+    "code": "279645233",
+    "author": "Anfrien",
+    "description": "Replaces the Fireaxe with Ruby Rose\u0027s Crescent Rose Scythe.",
+    "enabled": false
+  },
+  {
+    "name": "Entire Shrek Movie (2001) On Tv Prop Screen",
+    "code": "2830587693",
+    "author": "cbf",
+    "description": "Extremely jpegy and at 1 frame per second, but at least it won\u0027t get copyrighted",
+    "enabled": false
+  },
+  {
+    "name": "Homer Simpson car - Charger",
+    "code": "2852410920",
+    "author": "Minnie Mouse",
+    "description": "Outta my way, jerkass!",
+    "enabled": false
+  },
+  {
+    "name": "burnout revenge cars prop",
+    "code": "2871153568",
+    "author": "Xenecrite",
+    "description": "Some cars prop.",
+    "enabled": false
+  },
+  {
+    "name": "Futanari Taomon Survivor - 1",
+    "code": "2908747086",
+    "author": "7EMP3ST, WarfareMachine, J",
+    "description": "thicc furry",
+    "enabled": false
+  },
+  {
+    "name": "Snoop Dogg",
+    "code": "350718926",
+    "author": "Ada Wong",
+    "description": "The special infected smoker as the famous person Snoop Dogg",
+    "enabled": false
+  },
+  {
+    "name": "Convoy of Vans",
+    "code": "402765219",
+    "author": "Tr!cky",
+    "description": "RNG 9 Vans in a Cycle, HD White Van, Monster Van, A-Team, Overkill, The Mystery Machine, Kidnapper, The Punisher, Taps, Mike Tyson Van.",
+    "enabled": false
+  },
+  {
+    "name": "Playboy Magazine Stand",
+    "code": "424628764",
+    "author": "Waterpater",
+    "description": "Let\u0027s get dirty",
+    "enabled": false
+  },
+  {
+    "name": "Charger Donkey Kong",
+    "code": "434543684",
+    "author": "Splinks (edited by LeftyGreenMario)",
+    "description": "The charger is... a Donkey Kong",
+    "enabled": false
+  },
+  {
+    "name": "MCDONALDS",
+    "code": "440544017",
+    "author": "Ellie",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "Payday 2 Chicago Typewriter",
+    "code": "469022624",
+    "author": "Lt. Rocky \u0026 Cele",
+    "description": "Payday 2\u0027s Chicago Typewriter SMG, replaces the uzi SMG over Cele\u0027s Speakeasy animations",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Main \u0026 Shared",
+    "code": "469986973",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "HD+RNG Ammo Cans",
+    "code": "484240435",
+    "author": "Ellie",
+    "description": "This addon replaces the Ammo Cans by new HD Ones. There\u0027s a 1/2 chance that you get the regular ",
+    "enabled": false
+  },
+  {
+    "name": "18 RNG Helicopters",
+    "code": "489730954",
+    "author": "Ellie",
+    "description": "Replaces the helicopters by random ones : each time it\u0027s a different one that will pick you up.",
+    "enabled": false
+  },
+  {
+    "name": "Star Wars Red Lightsaber V04 [Baseball Bat]",
+    "code": "531026002",
+    "author": "Nicky_Da_B",
+    "description": "A mod that replaces the baseball bat model with a red single bladed lightsaber. Live out your Star Wars fantasy and become a jedi in L4D2 today! This mod includes a custom model, custom textures, custom sounds, and custom hud icon.",
+    "enabled": false
+  },
+  {
+    "name": "RNG Small Truck",
+    "code": "544648421",
+    "author": "Ellie",
+    "description": "Adds 20 new skins for the small white trucks that often have stuff inside. There will be one different design every map. Prefab by mrFunreal",
+    "enabled": false
+  },
+  {
+    "name": "Baymax Medkit",
+    "code": "547833172",
+    "author": "Ellie",
+    "description": "Replaces the Medkit by Baymax from Disney\u0027s movie Big Hero 6. Model in SFM by NefariousDrH",
+    "enabled": false
+  },
+  {
+    "name": "D concerto (Scar)",
+    "code": "560117984",
+    "author": "����",
+    "description": "This MOD modifies the scar,It has a new sound,It has a new way of holding.",
+    "enabled": false
+  },
+  {
+    "name": "door door",
+    "code": "567489696",
+    "author": "徒手开根号",
+    "description": "之前断网，闲得无聊做一套门吧.",
+    "enabled": false
+  },
+  {
+    "name": "Thomas The Tank Engine",
+    "code": "598341896",
+    "author": "Shoulderpants",
+    "description": "It\u0027s Thomas The Tank Engine! He replaces the train in the bridge event in Blood Harvest.",
+    "enabled": false
+  },
+  {
+    "name": "JOHN CENA Charger",
+    "code": "599811852",
+    "author": "Murky",
+    "description": "This will replace charger\u0027s charge sound and music to JOHN CENA music.",
+    "enabled": false
+  },
+  {
+    "name": "Patrick Boomer",
+    "code": "601707484",
+    "author": "Despair",
+    "description": "You got it set to W for Wumbo when it should be set to M for Mini.",
+    "enabled": false
+  },
+  {
+    "name": "Sandy",
+    "code": "605183125",
+    "author": "supreme leader",
+    "description": "Replaces Spitter",
+    "enabled": true
+  },
+  {
+    "name": "Silver Salmon",
+    "code": "631372446",
+    "author": "TravelerJoe",
+    "description": "Replace Cricket Bat by a Salmon. It\u0027s appearance only.",
+    "enabled": false
+  },
+  {
+    "name": "Safe Door Rainbow Transparent",
+    "code": "645910193",
+    "author": "徒手开根号genhao",
+    "description": "replace for the Safe Door. \r\nThe gun body is transparent and the lines are riotous with colour fluorescent effect. \r\nLike friends remember to evaluate my work, \r\nThe first time I want to know the latest works, \r\nremember to pay attention to my creative Workshop. \r\n ",
+    "enabled": false
+  },
+  {
+    "name": "HyperBeast hunting rifle",
+    "code": "655920325",
+    "author": ".:Aiden:.",
+    "description": "Reskin beta del famoso fucile M16 di CounterStrike:GO",
+    "enabled": true
+  },
+  {
+    "name": "HD Pizza Boxes + Pizzas (+RNG)",
+    "code": "657115231",
+    "author": "Ellie",
+    "description": "This addon adds 11 HD skins to the Pizza Boxes and now there can be HD PIZZAS inside (15 different ones). You\u0027ll get a different set every map.",
+    "enabled": false
+  },
+  {
+    "name": "LinDa B Explosive Barrel",
+    "code": "688443558",
+    "author": "CaoNISheep",
+    "description": "custom",
+    "enabled": false
+  },
+  {
+    "name": "Makise Kurisu - Nick (v2a2 - Testing Version)",
+    "code": "698521530",
+    "author": "Vanya (rigging) - Kakomiki (Model Creator)",
+    "description": "Current Skin Version: v2a2 - Testing Version (November 10th 2016)\r\n\r\nThe following mod replaces Nick from the Left 4 Dead 2 crew with Makise Kurisu from \u0027Steins;Gate\u0027, mod comes with custom HUD Icons, Jiggle Bones and First Person Arms\r\n\r\nCredits:\r\nKakomiki - Original model creator, model taken from MMD\r\nDevostator - Ported the model from MMD to another game (from which then I ported it here)\r\nVanya - Ported and rigged the model into Left 4 Dead 2, made HUD icons and first person arms (original artwork credits belong to their original authors)\r\ngkuo88 - Taught me how to add jigglebones into the model",
+    "enabled": false
+  },
+  {
+    "name": "V22 Osprey",
+    "code": "718407702",
+    "author": "Lt. Rocky",
+    "description": "COACH IS GOIN\u0027 FOR A RIIIIIIIDE",
+    "enabled": false
+  },
+  {
+    "name": "GenJi Katana",
+    "code": "724359195",
+    "author": "ClearSkyC",
+    "description": "replace for the katana",
+    "enabled": true
+  },
+  {
+    "name": "Storm Giant Warhammer",
+    "code": "729812965",
+    "author": "Old Man Push Car",
+    "description": "Replace the guitar,Made a new action and replace all sounds.All guitar set fluorescent effect,Basically restored in the original game action.",
+    "enabled": false
+  },
+  {
+    "name": "Energy Drink Adrenaline",
+    "code": "740516157",
+    "author": "Ellie",
+    "description": "Replaces the Adrenaline by Energy Drink on Doktor Haus Animations. Incl. custom sound and HD textures.",
+    "enabled": true
+  },
+  {
+    "name": "The Black Rose",
+    "code": "743812357",
+    "author": "AvengedDeathAlert",
+    "description": "Replace the Crowbar melee with Team Fortress 2 The Black Rose",
+    "enabled": false
+  },
+  {
+    "name": "Left 4 MLG",
+    "code": "796949709",
+    "author": "Trollmo",
+    "description": "This mod replaces music, sounds and UIs with MLG-regarding elements.",
+    "enabled": false
+  },
+  {
+    "name": "Tic Tac Pills",
+    "code": "802292239",
+    "author": "Ellie",
+    "description": "This addon turns the Pain Pills into Tic Tac boxes on the base game animations. There are 22 different skins (and flavors).",
+    "enabled": true
+  },
+  {
+    "name": "You reposted in the wrong safehouse",
+    "code": "811601267",
+    "author": "MrARM",
+    "description": "Replaces the safehouse music with You reposted in the wrong neighborhood",
+    "enabled": false
+  },
+  {
+    "name": "Halo 5 Longshot MA5D",
+    "code": "820446003",
+    "author": "Danger Wasp, MaxG3D",
+    "description": "The Halo 5 Longshot MA5D Assault rifle on MaxG3D\u0027s animations",
+    "enabled": false
+  },
+  {
+    "name": "Cat GUN",
+    "code": "827842553",
+    "author": "Walt",
+    "description": "                  ",
+    "enabled": false
+  },
+  {
+    "name": "Mystery Inc.",
+    "code": "844170828",
+    "author": "Gary",
+    "description": "Scooby-Doo? Where are you!",
+    "enabled": false
+  },
+  {
+    "name": "Gollum (Jockey)",
+    "code": "857491922",
+    "author": "MrHotdog",
+    "description": "Replaces common Jockey with the Gollum from The Lord of the Rings.",
+    "enabled": false
+  },
+  {
+    "name": "Rainbow Blood",
+    "code": "974949258",
+    "author": "Kashimura",
+    "description": "Rainbow blood particles and rainbow blood decals",
+    "enabled": false
+  }
+][
+  {
+    "name": "Optimus Prime-Truck",
+    "code": "1099517727",
+    "author": "Floh",
+    "description": "Replaces the Longnose- and Semi3-Truck with the Optimus Prime-Truck (Transformers)",
+    "enabled": false
+  },
+  {
+    "name": "RNG Cola Bottles",
+    "code": "1104688008",
+    "author": "Tr!cky",
+    "description": "6 Cola Bottles",
+    "enabled": false
+  },
+  {
+    "name": "Witch Rasputin",
+    "code": "1122383379",
+    "author": "TheAaron32G",
+    "description": "Replaces the music when the witch is near RARARASPUTIN",
+    "enabled": false
+  },
+  {
+    "name": "Vanilla For Rochelle(Nekopara)",
+    "code": "1138710165",
+    "author": "Peakness Yang",
+    "description": "Replaces Rochelle",
+    "enabled": false
+  },
+  {
+    "name": "ToyZ 3",
+    "code": "1142571737",
+    "author": "Mogabi",
+    "description": ". Get source files and tools for creating your own campaigns by downloading the Left 4 Dead Authoring tools SDK, which is available under the \u0027Tools\u0027 tab in Steam.",
+    "enabled": false
+  },
+  {
+    "name": "Team Health Counter",
+    "code": "121088866",
+    "author": "Rayman1103",
+    "description": "Adds a health counter for Survivor teammates. Now you can see how much health they actually have in numbers.",
+    "enabled": false
+  },
+  {
+    "name": "Left 4 Comrade: Soviet Union Flag",
+    "code": "1221088651",
+    "author": "Comrade",
+    "description": "Soviet Union Flag.",
+    "enabled": false
+  },
+  {
+    "name": "\t\t",
+    "code": "1238023804",
+    "author": "\t\t",
+    "description": "\t",
+    "enabled": false
+  },
+  {
+    "name": "Halo 3 ODST Genet Police cars (Police cars)",
+    "code": "1239887244",
+    "author": "Danger Wasp",
+    "description": "Replaces all Police Cars in L4D2 with the Police variant of the HuCiv Genet from Halo 3 ODST.",
+    "enabled": false
+  },
+  {
+    "name": "DeLorean DMC-12 Time Machine",
+    "code": "1240091974",
+    "author": "MrFunreal",
+    "description": "Replaces Jimmys car with the DeLorean",
+    "enabled": false
+  },
+  {
+    "name": "Argus - PS",
+    "code": "1242213955",
+    "description": "If you can read this, that means that either you downloaded it from somewhere else or you are trying to open VPK file. Please do not use that VPK file and download original addon from here: http://steamcommunity.com/id/abjecttree57929/myworkshopfiles/?appid\u003d550 .",
+    "enabled": false
+  },
+  {
+    "name": "Argus sound",
+    "code": "1242794800",
+    "author": "Mew Mew-Chan",
+    "description": "Argus sound mod to replace pump shotgun",
+    "enabled": false
+  },
+  {
+    "name": "                       ",
+    "code": "1252177390",
+    "author": "                      ",
+    "description": "                 ",
+    "enabled": true
+  },
+  {
+    "name": "Honoka V slingshot bikini RNG(hunter)",
+    "code": "1268841922",
+    "author": "ͽ�ֿ�����genhao",
+    "description": " \r\nProfessional students come from TECMO\u0027s game ",
+    "enabled": false
+  },
+  {
+    "name": "Heineken Molotov Cocktail",
+    "code": "127167490",
+    "author": "Miztaegg",
+    "description": "Heineken Molotov Cocktail",
+    "enabled": false
+  },
+  {
+    "name": "Table Tennis Racket (Frying Pan)",
+    "code": "127491605",
+    "author": "Yogensia",
+    "description": "Replaces Frying Pan with a table tennis paddle.",
+    "enabled": true
+  },
+  {
+    "name": "LaserMax Laser Sights",
+    "code": "128005925",
+    "author": "miztaegg",
+    "description": "First Shot Confidence!",
+    "enabled": false
+  },
+  {
+    "name": "Detailed Rusty Jerrycans, Propane and Oxygen Tanks",
+    "code": "130033528",
+    "author": "Miztaegg",
+    "description": "Detailed Rusty Jerrycans, Propane and Oxygen Tanks",
+    "enabled": false
+  },
+  {
+    "name": "DOOM Chaingun (M60)",
+    "code": "1312354014",
+    "author": "Aven",
+    "description": "M60",
+    "enabled": false
+  },
+  {
+    "name": "Steins;Gate  Soda machine",
+    "code": "134882477",
+    "author": "THOR",
+    "description": "SODA Machine Otaku, Steins;Gate",
+    "enabled": false
+  },
+  {
+    "name": "The Professional Scope",
+    "code": "136694569",
+    "author": "Red Schism",
+    "description": "Replaces the Sniper Scope sights with a highly detailed alternative featuring an Optical ",
+    "enabled": false
+  },
+  {
+    "name": "Touhou 18+ V Machine ",
+    "code": "1379069712",
+    "author": "Akyuun",
+    "description": "Touhou... Touhou.. Touhou Everywhere.... Let\u0027s Make All of them Praise The ZUN",
+    "enabled": false
+  },
+  {
+    "name": "Wurlitzer Jukebox",
+    "code": "1465215328",
+    "author": "MrFunreal",
+    "description": "Replaces the Jukebox.",
+    "enabled": false
+  },
+  {
+    "name": "White Medical Cabinet with glass",
+    "code": "1472110503",
+    "author": "MrFunreal",
+    "description": "Replaces the medical cabinet with a vwhite versio nthat has glass.",
+    "enabled": false
+  },
+  {
+    "name": "Defibrillator bag",
+    "code": "1494274936",
+    "author": "Ramm.asmiette",
+    "description": "Defibrillator bag",
+    "enabled": false
+  },
+  {
+    "name": "tv_simpsons hvp",
+    "code": "150855697",
+    "author": "K1CHWA",
+    "description": "tv_simpsons hvp",
+    "enabled": false
+  },
+  {
+    "name": "DMM Rebel Ice Axe (Crowbar)",
+    "code": "159491028",
+    "author": "Yogensia",
+    "description": "Replaces Crowbar with with a DMM Rebel ice axe.",
+    "enabled": false
+  },
+  {
+    "name": "Gnome \u003d\u003e Big Chungus",
+    "code": "1628789102",
+    "author": "ErichGrooms1",
+    "description": "That\u0027ll hold\u0027em alright, hehehehehehe! Phooey!",
+    "enabled": false
+  },
+  {
+    "name": "Phoneowave",
+    "code": "1636526632",
+    "author": "Kyōma Hōōin",
+    "description": "Future Gadget #8",
+    "enabled": false
+  },
+  {
+    "name": "Improved Art",
+    "code": "165916861",
+    "author": "jules_cools",
+    "description": "Improved Art.",
+    "enabled": false
+  },
+  {
+    "name": "Ghostrider\u0027s Chain",
+    "code": "1682200728",
+    "author": "Tanerseto",
+    "description": "DE: Ersetzt den Riot Shield, Schuldig jetzt müssen Die Zombies brennen ;)\r\n\t\t\t\t\t\t\t  EN: Replaces the Riot Shield Guilty now must burn the Zombies ;)",
+    "enabled": false
+  },
+  {
+    "name": "Explosive Ammo Chia",
+    "code": "1737329813",
+    "author": "NAVY",
+    "description": "Explosive Ammo from the Chia Series.",
+    "enabled": false
+  },
+  {
+    "name": "Incendiary Ammo Chia",
+    "code": "1737521676",
+    "author": "NAVY",
+    "description": "Incendiary Ammo from the Chia Series.",
+    "enabled": false
+  },
+  {
+    "name": "Miami Biker replaces Francis",
+    "code": "1779569184",
+    "author": "Chase/Scout_115",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "Snack Machine",
+    "code": "179471991",
+    "author": "Bukethead/fdsman",
+    "description": "High res vending machine snacks texture",
+    "enabled": false
+  },
+  {
+    "name": "【20Cat】Star Particle for Tank",
+    "code": "1910677185",
+    "author": "20Cat",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "\t\t",
+    "code": "1912215523",
+    "author": "\t\t",
+    "description": "\t",
+    "enabled": false
+  },
+  {
+    "name": "Apex Legends - Triple Take",
+    "code": "1912513163",
+    "author": "Twilight Sparkle/Respawn/Punk buster",
+    "description": "hi",
+    "enabled": false
+  },
+  {
+    "name": "Default Dance Tank Victory",
+    "code": "1919726251",
+    "author": "trigger_hurt",
+    "description": "h",
+    "enabled": false
+  },
+  {
+    "name": "OBAMADOOR",
+    "code": "1933251653",
+    "author": "ObamaGaming",
+    "description": "OBAMA DOOR",
+    "enabled": false
+  },
+  {
+    "name": "MIKU Reaver [Auto Shotgun]",
+    "code": "1965549113",
+    "author": "SF",
+    "description": "Reaver [Auto Shotgun]",
+    "enabled": true
+  },
+  {
+    "name": "LOLI MALL",
+    "code": "1976156822",
+    "author": "ElTitoDan",
+    "description": "Cute art only.",
+    "enabled": false
+  },
+  {
+    "name": "CSO2 M99_ss",
+    "code": "2026203857",
+    "author": "尼克LEON",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic",
+    "code": "2031028789",
+    "author": "Fugger",
+    "description": "Bad Maps",
+    "enabled": true
+  },
+  {
+    "name": "Glubtastic 2",
+    "code": "2066106924",
+    "author": "Fugger",
+    "description": "Even more Bad Maps",
+    "enabled": true
+  },
+  {
+    "name": "Zombies (PvZ:GW) replace CI",
+    "code": "2085506920",
+    "author": "Cow",
+    "description": "After Louis as a zombies, obviously there should be a mod that replace commons as zombies from PvZ Garden Warfare",
+    "enabled": false
+  },
+  {
+    "name": "Shrek The Tank",
+    "code": "210368756",
+    "author": "MasterGir",
+    "description": "Shrek\u0027s head on a Tank",
+    "enabled": false
+  },
+  {
+    "name": "CSO2 tomahawk",
+    "code": "2114349888",
+    "author": "尼克LEON",
+    "description": "CSO2 tomahawk replace for the machete.",
+    "enabled": false
+  },
+  {
+    "name": "Steins;Gate Death Music",
+    "code": "211899851",
+    "author": "alexander1685",
+    "description": "Farewell theme from Steins;Gate replaces death theme",
+    "enabled": false
+  },
+  {
+    "name": "CODOL_Fate",
+    "code": "2127886641",
+    "author": "尼克leon",
+    "description": "CODOL_Fate replace the ak47",
+    "enabled": true
+  },
+  {
+    "name": "Outrun",
+    "code": "2134975310",
+    "author": "Mogabi",
+    "description": "The Survivors have awoken in a mysterious place, now they must traverse the bizzare lego dimension and all of the obstacles that it has to offer before escaping.",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic 3",
+    "code": "2139756699",
+    "author": "Fugger",
+    "description": "Even more Bad Maps",
+    "enabled": true
+  },
+  {
+    "name": "HUD 701",
+    "code": "2163110492",
+    "author": "SHRIMP",
+    "description": "THIS IS A TEST",
+    "enabled": false
+  },
+  {
+    "name": "submarine",
+    "code": "2163774681",
+    "author": "oguzhan",
+    "description": "submarine",
+    "enabled": false
+  },
+  {
+    "name": "Remove Explosion Flash",
+    "code": "2165823958",
+    "author": "Lulin",
+    "enabled": true
+  },
+  {
+    "name": "Monica (Dealer)(DOAXV) {Replaces Zoey}",
+    "code": "2167149164",
+    "author": "Cassie",
+    "description": "Monica (Dealer)(DOAXV) {Replaces Zoey}",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Overlay",
+    "code": "2189358004",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Escape Vehicles",
+    "code": "2189391054",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Infected",
+    "code": "2189396300",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Skybox",
+    "code": "2189405704",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Vehicles",
+    "code": "2189409705",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Doors",
+    "code": "2189414528",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Items",
+    "code": "2189419829",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Sound, Ragdolls \u0026 Water",
+    "code": "2189441393",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - RNG",
+    "code": "2189446707",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "Smoker\u0027s Smoke Weed Everyday Death Sound",
+    "code": "219041763",
+    "author": "Gilboron",
+    "description": "Replaces the Smoker death sound with Snoop Dogg\u0027s \u0027Smoke Weed Everyday\u0027",
+    "enabled": false
+  },
+  {
+    "name": "Candy Ammo Pile",
+    "code": "220883704",
+    "author": "Sprinklez",
+    "description": "A variety of candy boxes ranging from sweet to totally awesome. Who needs ammunition when you\u0027ve got perfectly un-expired confectionary.",
+    "enabled": false
+  },
+  {
+    "name": "Witch Parade [Mutation]",
+    "code": "2212135654",
+    "author": "Solved",
+    "description": "To much Broomsticks to handle!",
+    "enabled": false
+  },
+  {
+    "name": "Among Us (Gnome)",
+    "code": "2235544107",
+    "author": "oguzhan",
+    "description": "Among Us Red",
+    "enabled": false
+  },
+  {
+    "name": "BONK! sounds for shovel",
+    "code": "2238059300",
+    "author": "V-Synth",
+    "description": "BONK!",
+    "enabled": false
+  },
+  {
+    "name": "Shovel Blade over Shovel",
+    "code": "2240386679",
+    "author": "Majro",
+    "description": "A shovel over a shovel. What a concept.",
+    "enabled": false
+  },
+  {
+    "name": "SB Witch Execution",
+    "code": "225108851",
+    "author": "Swooping Bears",
+    "description": "First and only witch crowning training map, that will not just put you in a room with a witch and a shotgun (meh), but show where and when exactly you have to shoot that bitch for 100% crowning in every possible situation.",
+    "enabled": false
+  },
+  {
+    "name": "Aquaman\u0027s Trident",
+    "code": "2251494977",
+    "author": "Iconoclast x nothing ( STEAM_0:1:561667204 x STEAM_0:1:33451111 )",
+    "description": "Replaces the pitchfork with Aquaman\u0027s Trident, please don\u0027t sue us",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA Main Menu Buttons",
+    "code": "2256147202",
+    "author": "MrFunreal",
+    "description": "adds TUMTaRA loading buttons to the main menu. also moves blog post",
+    "enabled": false
+  },
+  {
+    "name": "Jacket (Ellis)",
+    "code": "2256176946",
+    "author": "Salad",
+    "description": "Do you know what time it is? Replaces Ellis with PAYDAY 2\u0027s rendition of Jacket from Hotline Miami.",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA - Survivors",
+    "code": "2263388642",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "ToyZ 4",
+    "code": "2287567972",
+    "author": "Mogabi",
+    "description": ". Get source files and tools for creating your own campaigns by downloading the Left 4 Dead Authoring tools SDK, which is available under the \u0027Tools\u0027 tab in Steam.",
+    "enabled": false
+  },
+  {
+    "name": "Tda Akita Neru Append (v2)",
+    "code": "234179589",
+    "author": "CaptainBigButt",
+    "description": "Francis Replacement",
+    "enabled": false
+  },
+  {
+    "code": "2406154389",
+    "enabled": false
+  },
+  {
+    "name": "Pokeball.",
+    "code": "241776737",
+    "author": "IRIS",
+    "description": "The pokeball from Pokemon replaces the vomitjar. Model and Textures: Rafael De Jongh. Compile, Ported and Rigged: IRIS",
+    "enabled": false
+  },
+  {
+    "name": "Tda Kasane Teto Append (v2)",
+    "code": "242266504",
+    "author": "CaptainBigButt",
+    "description": "Louis Replacement",
+    "enabled": false
+  },
+  {
+    "name": "There Finger Bang",
+    "code": "242981806",
+    "author": "Splinks",
+    "description": "replacement for The Magnum",
+    "enabled": false
+  },
+  {
+    "name": "Rick Astley Defib",
+    "code": "244772417",
+    "author": "Anfrien",
+    "description": "Replaces the Defib sounds to Never Gonna Give you up by Rick Astley.",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic 4",
+    "code": "2459037122",
+    "author": "Fugger",
+    "description": "This needs to stop",
+    "enabled": true
+  },
+  {
+    "name": "Hunter Candia",
+    "code": "2485377489",
+    "author": "[Me]",
+    "description": "[Test]",
+    "enabled": false
+  },
+  {
+    "name": "Tda Yowane Haku Append (v2)",
+    "code": "249601409",
+    "author": "CaptainBigButt",
+    "description": "Bill Replacement",
+    "enabled": false
+  },
+  {
+    "name": "Titanfall C.A.R. SMG",
+    "code": "249662952",
+    "author": "Twilight Sparkle/Valve/Respawn/HyperMetal",
+    "description": "A replace for the Silenced SMG using the C.A.R. SMG know now more as (Combat Advanced Round Submachine Gun) from Titanfall with its original animations",
+    "enabled": false
+  },
+  {
+    "name": "- Pipe Bobomb -",
+    "code": "253436034",
+    "author": "Emperor Doom",
+    "description": "Bob-ombs are living, moving mechanical bombs with eyes, feet, and a wind-up key in the back. They are generic enemies who first appeared in Super Mario Bros. 2, and have appeared in nearly every Mario game since then. Their appearance, intelligence, and status in relation to Mario differ widely from game to game. They are usually either blue or black, but some variations are pink or red. They will also flash red and sometimes make beeping sounds if they are about to explode.",
+    "enabled": false
+  },
+  {
+    "name": "Titanfall Smart Pistol MK5",
+    "code": "254071513",
+    "author": "Twilight Sparkle/Arby26",
+    "description": "A replace for the Single Pistol and the dual pistols using the Smart Pistol MK5 and the Hammond P2011 from Titanfall",
+    "enabled": false
+  },
+  {
+    "name": "Red (Movie) (Nick)",
+    "code": "2549183331",
+    "author": "NootTheSpriter",
+    "description": "Replaces Nick",
+    "enabled": false
+  },
+  {
+    "name": "SVD Dragunov Sniper Rifle",
+    "code": "256852245",
+    "author": "Lt. Rocky",
+    "description": "Seph\u0027s SVD Dragunov; Replaces the Military Sniper on Arby\u0027s Zatsava animations",
+    "enabled": false
+  },
+  {
+    "name": "PDTH Style HUD",
+    "code": "2793070379",
+    "author": "AUTHOR_NAME",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "Glubtastic: Back 4 Glub",
+    "code": "2795386618",
+    "author": "Fugger",
+    "description": "British",
+    "enabled": true
+  },
+  {
+    "name": "Ruby Rose\u0027s Crescent Rose Fireaxe",
+    "code": "279645233",
+    "author": "Anfrien",
+    "description": "Replaces the Fireaxe with Ruby Rose\u0027s Crescent Rose Scythe.",
+    "enabled": false
+  },
+  {
+    "name": "Entire Shrek Movie (2001) On Tv Prop Screen",
+    "code": "2830587693",
+    "author": "cbf",
+    "description": "Extremely jpegy and at 1 frame per second, but at least it won\u0027t get copyrighted",
+    "enabled": false
+  },
+  {
+    "name": "Homer Simpson car - Charger",
+    "code": "2852410920",
+    "author": "Minnie Mouse",
+    "description": "Outta my way, jerkass!",
+    "enabled": false
+  },
+  {
+    "name": "burnout revenge cars prop",
+    "code": "2871153568",
+    "author": "Xenecrite",
+    "description": "Some cars prop.",
+    "enabled": false
+  },
+  {
+    "name": "Futanari Taomon Survivor - 1",
+    "code": "2908747086",
+    "author": "7EMP3ST, WarfareMachine, J",
+    "description": "thicc furry",
+    "enabled": false
+  },
+  {
+    "name": "Snoop Dogg",
+    "code": "350718926",
+    "author": "Ada Wong",
+    "description": "The special infected smoker as the famous person Snoop Dogg",
+    "enabled": false
+  },
+  {
+    "name": "Convoy of Vans",
+    "code": "402765219",
+    "author": "Tr!cky",
+    "description": "RNG 9 Vans in a Cycle, HD White Van, Monster Van, A-Team, Overkill, The Mystery Machine, Kidnapper, The Punisher, Taps, Mike Tyson Van.",
+    "enabled": false
+  },
+  {
+    "name": "Playboy Magazine Stand",
+    "code": "424628764",
+    "author": "Waterpater",
+    "description": "Let\u0027s get dirty",
+    "enabled": false
+  },
+  {
+    "name": "Charger Donkey Kong",
+    "code": "434543684",
+    "author": "Splinks (edited by LeftyGreenMario)",
+    "description": "The charger is... a Donkey Kong",
+    "enabled": false
+  },
+  {
+    "name": "MCDONALDS",
+    "code": "440544017",
+    "author": "Ellie",
+    "description": "",
+    "enabled": false
+  },
+  {
+    "name": "Payday 2 Chicago Typewriter",
+    "code": "469022624",
+    "author": "Lt. Rocky \u0026 Cele",
+    "description": "Payday 2\u0027s Chicago Typewriter SMG, replaces the uzi SMG over Cele\u0027s Speakeasy animations",
+    "enabled": false
+  },
+  {
+    "name": "TUMTaRA V7 - Main \u0026 Shared",
+    "code": "469986973",
+    "author": "MrFunreal",
+    "description": "part of The Ultimate Mod Testing and Reviewing Area V7",
+    "enabled": false
+  },
+  {
+    "name": "HD+RNG Ammo Cans",
+    "code": "484240435",
+    "author": "Ellie",
+    "description": "This addon replaces the Ammo Cans by new HD Ones. There\u0027s a 1/2 chance that you get the regular ",
+    "enabled": false
+  },
+  {
+    "name": "18 RNG Helicopters",
+    "code": "489730954",
+    "author": "Ellie",
+    "description": "Replaces the helicopters by random ones : each time it\u0027s a different one that will pick you up.",
+    "enabled": false
+  },
+  {
+    "name": "Star Wars Red Lightsaber V04 [Baseball Bat]",
+    "code": "531026002",
+    "author": "Nicky_Da_B",
+    "description": "A mod that replaces the baseball bat model with a red single bladed lightsaber. Live out your Star Wars fantasy and become a jedi in L4D2 today! This mod includes a custom model, custom textures, custom sounds, and custom hud icon.",
+    "enabled": false
+  },
+  {
+    "name": "RNG Small Truck",
+    "code": "544648421",
+    "author": "Ellie",
+    "description": "Adds 20 new skins for the small white trucks that often have stuff inside. There will be one different design every map. Prefab by mrFunreal",
+    "enabled": false
+  },
+  {
+    "name": "Baymax Medkit",
+    "code": "547833172",
+    "author": "Ellie",
+    "description": "Replaces the Medkit by Baymax from Disney\u0027s movie Big Hero 6. Model in SFM by NefariousDrH",
+    "enabled": false
+  },
+  {
+    "name": "D concerto (Scar)",
+    "code": "560117984",
+    "author": "����",
+    "description": "This MOD modifies the scar,It has a new sound,It has a new way of holding.",
+    "enabled": false
+  },
+  {
+    "name": "door door",
+    "code": "567489696",
+    "author": "徒手开根号",
+    "description": "之前断网，闲得无聊做一套门吧.",
+    "enabled": false
+  },
+  {
+    "name": "Thomas The Tank Engine",
+    "code": "598341896",
+    "author": "Shoulderpants",
+    "description": "It\u0027s Thomas The Tank Engine! He replaces the train in the bridge event in Blood Harvest.",
+    "enabled": false
+  },
+  {
+    "name": "JOHN CENA Charger",
+    "code": "599811852",
+    "author": "Murky",
+    "description": "This will replace charger\u0027s charge sound and music to JOHN CENA music.",
+    "enabled": false
+  },
+  {
+    "name": "Patrick Boomer",
+    "code": "601707484",
+    "author": "Despair",
+    "description": "You got it set to W for Wumbo when it should be set to M for Mini.",
+    "enabled": false
+  },
+  {
+    "name": "Sandy",
+    "code": "605183125",
+    "author": "supreme leader",
+    "description": "Replaces Spitter",
+    "enabled": true
+  },
+  {
+    "name": "Silver Salmon",
+    "code": "631372446",
+    "author": "TravelerJoe",
+    "description": "Replace Cricket Bat by a Salmon. It\u0027s appearance only.",
+    "enabled": false
+  },
+  {
+    "name": "Safe Door Rainbow Transparent",
+    "code": "645910193",
+    "author": "徒手开根号genhao",
+    "description": "replace for the Safe Door. \r\nThe gun body is transparent and the lines are riotous with colour fluorescent effect. \r\nLike friends remember to evaluate my work, \r\nThe first time I want to know the latest works, \r\nremember to pay attention to my creative Workshop. \r\n ",
+    "enabled": false
+  },
+  {
+    "name": "HyperBeast hunting rifle",
+    "code": "655920325",
+    "author": ".:Aiden:.",
+    "description": "Reskin beta del famoso fucile M16 di CounterStrike:GO",
+    "enabled": true
+  },
+  {
+    "name": "HD Pizza Boxes + Pizzas (+RNG)",
+    "code": "657115231",
+    "author": "Ellie",
+    "description": "This addon adds 11 HD skins to the Pizza Boxes and now there can be HD PIZZAS inside (15 different ones). You\u0027ll get a different set every map.",
+    "enabled": false
+  },
+  {
+    "name": "LinDa B Explosive Barrel",
+    "code": "688443558",
+    "author": "CaoNISheep",
+    "description": "custom",
+    "enabled": false
+  },
+  {
+    "name": "Makise Kurisu - Nick (v2a2 - Testing Version)",
+    "code": "698521530",
+    "author": "Vanya (rigging) - Kakomiki (Model Creator)",
+    "description": "Current Skin Version: v2a2 - Testing Version (November 10th 2016)\r\n\r\nThe following mod replaces Nick from the Left 4 Dead 2 crew with Makise Kurisu from \u0027Steins;Gate\u0027, mod comes with custom HUD Icons, Jiggle Bones and First Person Arms\r\n\r\nCredits:\r\nKakomiki - Original model creator, model taken from MMD\r\nDevostator - Ported the model from MMD to another game (from which then I ported it here)\r\nVanya - Ported and rigged the model into Left 4 Dead 2, made HUD icons and first person arms (original artwork credits belong to their original authors)\r\ngkuo88 - Taught me how to add jigglebones into the model",
+    "enabled": false
+  },
+  {
+    "name": "V22 Osprey",
+    "code": "718407702",
+    "author": "Lt. Rocky",
+    "description": "COACH IS GOIN\u0027 FOR A RIIIIIIIDE",
+    "enabled": false
+  },
+  {
+    "name": "GenJi Katana",
+    "code": "724359195",
+    "author": "ClearSkyC",
+    "description": "replace for the katana",
+    "enabled": true
+  },
+  {
+    "name": "Storm Giant Warhammer",
+    "code": "729812965",
+    "author": "Old Man Push Car",
+    "description": "Replace the guitar,Made a new action and replace all sounds.All guitar set fluorescent effect,Basically restored in the original game action.",
+    "enabled": false
+  },
+  {
+    "name": "Energy Drink Adrenaline",
+    "code": "740516157",
+    "author": "Ellie",
+    "description": "Replaces the Adrenaline by Energy Drink on Doktor Haus Animations. Incl. custom sound and HD textures.",
+    "enabled": true
+  },
+  {
+    "name": "The Black Rose",
+    "code": "743812357",
+    "author": "AvengedDeathAlert",
+    "description": "Replace the Crowbar melee with Team Fortress 2 The Black Rose",
+    "enabled": false
+  },
+  {
+    "name": "Left 4 MLG",
+    "code": "796949709",
+    "author": "Trollmo",
+    "description": "This mod replaces music, sounds and UIs with MLG-regarding elements.",
+    "enabled": false
+  },
+  {
+    "name": "Tic Tac Pills",
+    "code": "802292239",
+    "author": "Ellie",
+    "description": "This addon turns the Pain Pills into Tic Tac boxes on the base game animations. There are 22 different skins (and flavors).",
+    "enabled": true
+  },
+  {
+    "name": "You reposted in the wrong safehouse",
+    "code": "811601267",
+    "author": "MrARM",
+    "description": "Replaces the safehouse music with You reposted in the wrong neighborhood",
+    "enabled": false
+  },
+  {
+    "name": "Halo 5 Longshot MA5D",
+    "code": "820446003",
+    "author": "Danger Wasp, MaxG3D",
+    "description": "The Halo 5 Longshot MA5D Assault rifle on MaxG3D\u0027s animations",
+    "enabled": false
+  },
+  {
+    "name": "Cat GUN",
+    "code": "827842553",
+    "author": "Walt",
+    "description": "                  ",
+    "enabled": false
+  },
+  {
+    "name": "Mystery Inc.",
+    "code": "844170828",
+    "author": "Gary",
+    "description": "Scooby-Doo? Where are you!",
+    "enabled": false
+  },
+  {
+    "name": "Gollum (Jockey)",
+    "code": "857491922",
+    "author": "MrHotdog",
+    "description": "Replaces common Jockey with the Gollum from The Lord of the Rings.",
+    "enabled": false
+  },
+  {
+    "name": "Rainbow Blood",
+    "code": "974949258",
+    "author": "Kashimura",
+    "description": "Rainbow blood particles and rainbow blood decals",
+    "enabled": false
+  }
+][][][]

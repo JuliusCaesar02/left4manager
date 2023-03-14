@@ -21,7 +21,7 @@ public class OptionsTab extends JPanel {
 		public OptionsTab() {
 			
 		}
-		public OptionsTab(Config config, ExtractModList extractModList){
+		public OptionsTab(Config config, ModList modList){
 		super();
 		setLayout(new GridLayout(2, 5));
 		add(new JLabel("Change l4d2 directory"));

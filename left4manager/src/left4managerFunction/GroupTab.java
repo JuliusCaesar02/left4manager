@@ -42,17 +42,17 @@ import left4managerFunction.TableModels.GroupModTableModel;
 
 public class GroupTab extends JPanel {
 	Config config;
-	ExtractModList extractModList;
+	ModList modList;
 	GroupModTableModel modListModel;
 	private GroupListTableModel groupListModel;
 	ModGroupPopUp newModGroupPopUp;
 	JTable groupListTable;
 	JTable modListTable;
 	
-	public GroupTab(Config config, ExtractModList extractModList) {
+	public GroupTab(Config config, ModList modList) {
 		super();
 		this.config = config;
-		this.extractModList = extractModList;
+		this.modList = modList;
 				
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -71,7 +71,7 @@ public class GroupTab extends JPanel {
 		add(new ColumnPanel(), c);
 		
 	}
-	
+
 	public class ColumnPanel extends JPanel {
 		
 		public ColumnPanel() {
@@ -98,7 +98,7 @@ public class GroupTab extends JPanel {
 						List<ModInfo> newModList = new ArrayList<ModInfo>();
 						ModGroup selectedGroup = groupListModel.getRow(selectionIndex);
 						for (int i = 0; i < selectedGroup.getGroupModList().size(); i++) {
-							ModInfo singleMod = extractModList.getModInfoByCode(selectedGroup.getGroupMod(i));
+							ModInfo singleMod = modList.getModInfoByCode(selectedGroup.getGroupMod(i));
 							newModList.add(singleMod);
 						}
 						modListModel.add(newModList);
@@ -301,7 +301,7 @@ public class GroupTab extends JPanel {
 				groupNameInput.setText(groupListModel.getGroupName(selectedIndex));
 				groupNamePane.add(groupNameInput);
 				for (int i = 0; i < groupListModel.getRow(selectedIndex).getSize(); i++) {
-					newGroupModel.add(extractModList.getModInfoByCode(groupListModel.getRow(selectedIndex).getGroupMod(i)));
+					newGroupModel.add(modList.getModInfoByCode(groupListModel.getRow(selectedIndex).getGroupMod(i)));
 				}
 			} else {
 				groupNamePane.add(groupNameLabel, BorderLayout.LINE_START);
@@ -315,7 +315,7 @@ public class GroupTab extends JPanel {
 			JTable allModTable = new JTable(allModModel);
 			TableRowSorter<GroupModTableModel> sorter = new TableRowSorter<>(allModModel);
 			allModTable.setRowSorter(sorter);
-			allModModel.add(extractModList.getModList());
+			allModModel.add(modList.getModList());
 			if (selectedIndex != -2) {
 				ModGroup group = groupListModel.getRow(selectedIndex);
 				for(String modCode : group.getGroupModList()) {

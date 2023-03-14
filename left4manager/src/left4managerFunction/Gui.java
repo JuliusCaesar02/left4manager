@@ -47,7 +47,7 @@ public class Gui {
 
 	private JFrame frame;
 	Config config = new Config();
-	ExtractModList extractModList;
+	ModList modList;
 	UpdateModFile updateModFile;
 	AllTags allTags;
 	//GroupListTableModel groupListModel = new GroupListTableModel();
@@ -158,7 +158,7 @@ public class Gui {
 	private void initialize() {
 		updateModFile = new UpdateModFile(config);
 		allTags = new AllTags(config);
-		extractModList = new ExtractModList(config);
+		modList = new ModList(config);
 		
 		CustomFrame loadingFrame = new CustomFrame("L4M: Mod info loading");
 		loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -190,13 +190,13 @@ public class Gui {
 				List<ModInfo> l4d2ModList = new ArrayList<ModInfo>();
 				
 				try {
-					l4d2ModList = extractModList.readL4d2ModList();
+					l4d2ModList = modList.getL4D2ModList();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
-				extractModList.createJsonFile();
+				Utilities.createFile(modList.getJsonFile());
 				double totalProgress = 0;
 				int listSize = l4d2ModList.size();
 				double progress = (100.0 / listSize);
@@ -205,27 +205,31 @@ public class Gui {
 					ModInfo singleMod = l4d2ModList.get(i);
 					boolean enabled = singleMod.getEnabled();
 					try {
-						ModInfo objectFromJson = extractModList.getObjectFromJson(singleMod.getCode());
+						ModInfo objectFromJson = Utilities.modInfoFromJson(modList.getJsonFile(), singleMod.getCode());
 						System.out.println("Mod found in json");
 						objectFromJson.setEnabled(enabled);
-						extractModList.getModList().add(objectFromJson);	
+						modList.getModList().add(objectFromJson);	
 						modName = objectFromJson.getName();
 						System.out.println(objectFromJson.getName());
 					} catch (NullPointerException | IOException e) {
 						System.out.println("Mod NOT found in json");
 						try {
-							String html = extractModList.getHtml(singleMod.getCode());
-							String[] additionalInfo =  extractModList.getAdditionalInfo(html);
-							List<Tags> tags =  extractModList.getTags(html);
+					    	String url = "https://steamcommunity.com/sharedfiles/filedetails/?id=" +singleMod.getCode();
+							String html = Utilities.getHtml(url, "<div class=\"detailBox\"><script type=\"text/javascript\">");
+							String[] additionalInfo =  modList.getAdditionalInfo(html);
+							List<Tags> tags =  modList.getTags(html);
 							modName = additionalInfo[0];
 							singleMod.setInfo(additionalInfo[0], additionalInfo[1], additionalInfo[2], tags);
-							extractModList.getModList().add(singleMod);		
+							modList.getModList().add(singleMod);		
 						} catch(IOException f) {
 							System.out.println("No internet");
 							headerLabel.setText("No internet connection");
-							singleMod = extractModList.getObjectFromVPK(singleMod.getCode());
-							singleMod.setEnabled(enabled);
-							extractModList.getModList().add(singleMod);
+							File vpkArchive = new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator
+									+"addons" +File.separator +"workshop" +File.separator +singleMod.getCode() +".vpk");
+							System.out.println(vpkArchive);
+							String[] vpkInfo = modList.parseVPKInfo(Utilities.getVPKInfo(vpkArchive));
+							singleMod.setInfo(vpkInfo[0], vpkInfo[1], vpkInfo[2], null);
+							modList.getModList().add(singleMod);
 						}
 					}
 					totalProgress += progress;
@@ -234,13 +238,14 @@ public class Gui {
 					fractionLabel.setText("Mod " +(i + 1) +"/" +listSize);
 				}
 				
+				groupTab = new GroupTab(config, modList);
+				System.out.println(groupTab.getGroupListModel().getList());
 				try {
-					extractModList.addObjectToJson(extractModList.getModList());
+					Utilities.jsonWriter(modList.getJsonFile(), modList.getModList());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				groupTab = new GroupTab(config, extractModList);
 				return null;
 			}
 			
@@ -272,7 +277,7 @@ public class Gui {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("List", createListTab());
 		tabbedPane.add("Group", groupTab);
-		tabbedPane.add("Order", new SortingTab(extractModList.getModList()));
+		tabbedPane.add("Order", new SortingTab(modList.getModList()));
 		tabbedPane.add("Tag", createTagTab());
 		tabbedPane.add("Options", tab5);
 		return tabbedPane;
@@ -287,7 +292,7 @@ public class Gui {
 		selectAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
 		GroupModTableModel model = new GroupModTableModel();
-		model.add(extractModList.getModList());
+		model.add(modList.getModList());
 		JTable table = new JTable(model);
 		table.getColumnModel().getColumn(0).setPreferredWidth(200);
 		table.getColumnModel().getColumn(1).setPreferredWidth(50);
@@ -360,11 +365,12 @@ public class Gui {
 								public void actionPerformed(ActionEvent e) {
 									String html = "";
 									try {
-										html = extractModList.getHtml(selectedModCode);
-										String[] additionalInfo = extractModList.getAdditionalInfo(html);
-										List<Tags> tagList = extractModList.getTags(html);
-										int modIndex = extractModList.getModIndexByCode(selectedModCode);
-										extractModList.getModList().get(modIndex).setInfo(additionalInfo[0],
+										String url = "https://steamcommunity.com/sharedfiles/filedetails/?id=" +selectedModCode;
+										html = Utilities.getHtml(url, "<div class=\"detailBox\"><script type=\"text/javascript\">");
+										String[] additionalInfo = modList.getAdditionalInfo(html);
+										List<Tags> tagList = modList.getTags(html);
+										int modIndex = modList.getModIndexByCode(selectedModCode);
+										modList.getModList().get(modIndex).setInfo(additionalInfo[0],
 												additionalInfo[1],
 												additionalInfo[2],
 												tagList
@@ -463,7 +469,7 @@ public class Gui {
 			public void valueChanged(ListSelectionEvent event) {	
 				JPanel panel = new JPanel();
 				try {
-					panel = createRigthPanel(extractModList.getModList().get(table.convertRowIndexToModel(table.getSelectedRow())));
+					panel = createRigthPanel(modList.getModList().get(table.convertRowIndexToModel(table.getSelectedRow())));
 				} catch(Exception e) {
 				}
 				listPane.remove(1);
@@ -472,7 +478,7 @@ public class Gui {
 			}
 		});
 		listPane.add(leftPane);
-		rightPanel = createRigthPanel(extractModList.getModList().get(0));
+		rightPanel = createRigthPanel(modList.getModList().get(0));
 		listPane.add(rightPanel);
 
 		return listPane;
@@ -531,7 +537,7 @@ public class Gui {
 		rightScrollPane.setBorder(null);
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateModFile.writeFile(updateModFile.buildString(extractModList.getModList()));
+				updateModFile.writeFile(updateModFile.buildString(modList.getModList()));
 			}
 		});
 		int scrollPaneWidth = 0;
