@@ -25,6 +25,7 @@ import com.connorhaigh.javavpk.core.ArchiveEntry;
 import com.connorhaigh.javavpk.core.Directory;
 import com.connorhaigh.javavpk.exceptions.ArchiveException;
 import com.connorhaigh.javavpk.exceptions.EntryException;
+import com.google.gson.stream.MalformedJsonException;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
@@ -46,10 +47,10 @@ import javax.swing.event.PopupMenuListener;
 public class Gui {
 
 	private JFrame frame;
-	Config config = new Config();
 	ModList modList;
 	UpdateModFile updateModFile;
 	AllTags allTags;
+	Config config = new Config();
 	//GroupListTableModel groupListModel = new GroupListTableModel();
 	GroupTab groupTab;
 
@@ -68,11 +69,12 @@ public class Gui {
 
 	public Gui() {
 		try {
-			config.readFile();
-			initialize();
-		} catch (IOException e) {
+			config.readConfig();
+			checkConfigs();
+		} catch (Exception e) {
 			chooseDirectoryWindow();
 		}
+
 	}
 
 	public void chooseDirectoryWindow() {
@@ -109,13 +111,10 @@ public class Gui {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				config.createFolder();
-				config.setL4D2Dir(input.getText());
-				File file = new File(config.getL4D2Dir());
-				if (file.getName().equals("Left 4 Dead 2")) {
-					JProgressBar progressBar = new JProgressBar(0, 100);
-					config.writeFile();
-					initialize();
+				File l4d2Dir = new File(input.getText());
+				if (l4d2Dir.getName().equals("Left 4 Dead 2")) {
+					config.setL4D2Dir(l4d2Dir);
+					checkConfigs();
 					chooseDirectory.dispose();
 				} else {
 					JOptionPane.showMessageDialog(frame,
@@ -154,8 +153,54 @@ public class Gui {
 			System.out.println("Cancel was selected");
 		}
 	}
+	
+	private void settingsWindow() {
+		CustomFrame settingsFrame = new CustomFrame("L4M: Settings");
+		JPanel mainFrame = new JPanel();
+		mainFrame.add(new JPanel());
+		
+		JPanel row1 = new JPanel();
+		row1.add(new JLabel("Offline mode"));
+		JCheckBox offlineMode = new JCheckBox();
+		row1.add(offlineMode);
+		mainFrame.add(row1);
+		
+		JButton applyButton = new JButton("Apply");
+		applyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				config.setConfigs(1, Boolean.toString(offlineMode.isSelected()));
+				settingsFrame.dispose();
+				checkConfigs();
+			}
+		});
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				settingsFrame.dispose();
+			}
+		});
+		mainFrame.add(cancelButton);
+		mainFrame.add(applyButton);
+		settingsFrame.add(mainFrame);
+		settingsFrame.setVisible(true);
+	}
+	
+	private void checkConfigs() {
+		if(config.getConfigs()[1][1] == null || config.getConfigs()[1][1].equals("null")) {
+			settingsWindow();
+		}
+		else initialize();
+	}
 
 	private void initialize() {
+		try {
+			config.writeConfig();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		updateModFile = new UpdateModFile(config);
 		allTags = new AllTags(config);
 		modList = new ModList(config);
@@ -184,7 +229,80 @@ public class Gui {
 		loadingFrame.add(mainPanel);
 		loadingFrame.setVisible(true);
 		
-		class PopulateModList extends SwingWorker<Void, Double> {	
+		class PopulateModListVPK extends SwingWorker<Void, Double> {	
+			@Override
+			protected Void doInBackground() throws Exception {
+				List<ModInfo> l4d2ModList = new ArrayList<ModInfo>();
+				
+				try {
+					l4d2ModList = modList.getL4D2ModList();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println(l4d2ModList.size());
+				
+				double totalProgress = 0;
+				int listSize = l4d2ModList.size();
+				double progress = (100.0 / listSize);
+				for(int i = 0; i < l4d2ModList.size(); i++) {
+					ModInfo singleMod = l4d2ModList.get(i);
+					boolean enabled = singleMod.getEnabled();
+					String modName = "";
+
+					try {
+						ModInfo objectFromJson = Utilities.modInfoFromJson(modList.getJsonFile(), singleMod.getCode());
+						System.out.println("Mod found in json");
+						if(objectFromJson.getInfoSource() > 0) {
+							objectFromJson.setEnabled(enabled);
+							modList.getModList().add(objectFromJson);	
+							modName = objectFromJson.getName();
+						}
+						else throw new Exception();
+					} catch (Exception e) {
+						System.out.println("Mod not found in json");
+						File vpkArchive = new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator
+								+"addons" +File.separator +"workshop" +File.separator +singleMod.getCode() +".vpk");
+						String vpkText = Utilities.getVPKInfo(vpkArchive);
+						if(vpkText != null) {
+							String[] vpkInfo = modList.parseVPKInfo(vpkText);
+							singleMod.setInfo(vpkInfo[0], vpkInfo[1], vpkInfo[2], null);
+							singleMod.setInfoSource((short) 1);
+							modList.getModList().add(singleMod);
+							modName = singleMod.getName();
+						}
+					}
+					
+					totalProgress += progress;
+					setProgress((int) Math.round(totalProgress));
+					modInfoLabel.setText("Getting info for " +modName);
+					fractionLabel.setText("Mod " +(i + 1) +"/" +listSize);
+				}
+				
+				groupTab = new GroupTab(config, modList);
+				System.out.println(groupTab.getGroupListModel().getList());
+				return null;
+			}
+			
+			@Override
+			protected void done() {
+				Utilities.createFile(modList.getJsonFile());
+				try {
+					Utilities.jsonWriter(modList.getJsonFile(), modList.getModList(), false);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				frame = new CustomFrame("Left4Manager");
+				frame.setBounds(200, 200, 1080, 720);
+				frame.add(createTabbedPane());
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setVisible(true);
+				loadingFrame.dispose();
+			}
+		}
+		
+		class PopulateModListHTML extends PopulateModListVPK {	
 			@Override
 			protected Void doInBackground() throws Exception {
 				List<ModInfo> l4d2ModList = new ArrayList<ModInfo>();
@@ -196,40 +314,44 @@ public class Gui {
 					e.printStackTrace();
 				}
 				
-				Utilities.createFile(modList.getJsonFile());
 				double totalProgress = 0;
 				int listSize = l4d2ModList.size();
 				double progress = (100.0 / listSize);
 				String modName = "";
 				for(int i = 0; i < l4d2ModList.size(); i++) {
 					ModInfo singleMod = l4d2ModList.get(i);
-					boolean enabled = singleMod.getEnabled();
 					try {
-						ModInfo objectFromJson = Utilities.modInfoFromJson(modList.getJsonFile(), singleMod.getCode());
 						System.out.println("Mod found in json");
-						objectFromJson.setEnabled(enabled);
-						modList.getModList().add(objectFromJson);	
-						modName = objectFromJson.getName();
-						System.out.println(objectFromJson.getName());
+						ModInfo objectFromJson = Utilities.modInfoFromJson(modList.getJsonFile(), singleMod.getCode());
+						if(objectFromJson.getInfoSource() == 2) {
+							objectFromJson.setEnabled(singleMod.getEnabled());
+							modList.getModList().add(objectFromJson);	
+							modName = objectFromJson.getName();
+						}
+						else throw new NullPointerException();
 					} catch (NullPointerException | IOException e) {
 						System.out.println("Mod NOT found in json");
 						try {
 					    	String url = "https://steamcommunity.com/sharedfiles/filedetails/?id=" +singleMod.getCode();
 							String html = Utilities.getHtml(url, "<div class=\"detailBox\"><script type=\"text/javascript\">");
 							String[] additionalInfo =  modList.getAdditionalInfo(html);
+							System.out.println(additionalInfo[0]);
 							List<Tags> tags =  modList.getTags(html);
 							modName = additionalInfo[0];
 							singleMod.setInfo(additionalInfo[0], additionalInfo[1], additionalInfo[2], tags);
+							singleMod.setInfoSource((short) 2);
 							modList.getModList().add(singleMod);		
 						} catch(IOException f) {
-							System.out.println("No internet");
-							headerLabel.setText("No internet connection");
 							File vpkArchive = new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator
 									+"addons" +File.separator +"workshop" +File.separator +singleMod.getCode() +".vpk");
-							System.out.println(vpkArchive);
-							String[] vpkInfo = modList.parseVPKInfo(Utilities.getVPKInfo(vpkArchive));
-							singleMod.setInfo(vpkInfo[0], vpkInfo[1], vpkInfo[2], null);
-							modList.getModList().add(singleMod);
+							String vpkText = Utilities.getVPKInfo(vpkArchive);
+							if(vpkText != null) {
+								String[] vpkInfo = modList.parseVPKInfo(vpkText);
+								singleMod.setInfo(vpkInfo[0], vpkInfo[1], vpkInfo[2], null);
+								singleMod.setInfoSource((short) 1);
+								modList.getModList().add(singleMod);
+								modName = singleMod.getName();
+							}
 						}
 					}
 					totalProgress += progress;
@@ -237,38 +359,29 @@ public class Gui {
 					modInfoLabel.setText("Getting info for " +modName);
 					fractionLabel.setText("Mod " +(i + 1) +"/" +listSize);
 				}
-				
-				groupTab = new GroupTab(config, modList);
-				System.out.println(groupTab.getGroupListModel().getList());
-				try {
-					Utilities.jsonWriter(modList.getJsonFile(), modList.getModList());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				return null;
 			}
-			
-			@Override
-			protected void done() {
-				frame = new CustomFrame("Left4Manager");
-				frame.setBounds(200, 200, 1080, 720);
-				frame.add(createTabbedPane());
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.setVisible(true);
-				loadingFrame.dispose();
-	       }
 		}
 		
-		PopulateModList pupulateModList = new PopulateModList();
+		/*PopulateModListVPK pupulateModList = new PopulateModListVPK();
 		pupulateModList.addPropertyChangeListener(
-		     new PropertyChangeListener() {
-		         public  void propertyChange(PropertyChangeEvent evt) {
-		             if ("progress".equals(evt.getPropertyName())) {
-		            	 loadingBar.setValue((Integer) evt.getNewValue());
-		             }
-		         }
-		});
+				new PropertyChangeListener() {
+					public  void propertyChange(PropertyChangeEvent evt) {
+						if ("progress".equals(evt.getPropertyName())) {
+							loadingBar.setValue((Integer) evt.getNewValue());
+						}
+					}
+				});
+		pupulateModList.execute();	*/
+		PopulateModListHTML pupulateModList = new PopulateModListHTML();
+		pupulateModList.addPropertyChangeListener(
+				new PropertyChangeListener() {
+					public  void propertyChange(PropertyChangeEvent evt) {
+						if ("progress".equals(evt.getPropertyName())) {
+							loadingBar.setValue((Integer) evt.getNewValue());
+						}
+					}
+				});
 		pupulateModList.execute();
 	}
 
@@ -410,7 +523,7 @@ public class Gui {
 										removeFromGroupItem.addActionListener(new ActionListener() {
 											public void actionPerformed(ActionEvent e) {
 												groupListModel.getRow(index).remove(selectedModCode);
-												config.writeModGroupFile(groupListModel.getList());
+												//config.writeModGroupFile(groupListModel.getList());
 											}
 										});
 										removeFromGroupButton.add(removeFromGroupItem);
@@ -423,7 +536,7 @@ public class Gui {
 									addToGroupItem.addActionListener(new ActionListener() {
 										public void actionPerformed(ActionEvent e) {
 											groupListModel.getRow(index).add(selectedModCode);
-											config.writeModGroupFile(groupListModel.getList());
+											//config.writeModGroupFile(groupListModel.getList());
 										}
 									});
 									addToGroupButton.add(addToGroupItem);
@@ -834,7 +947,7 @@ public class Gui {
 		CustomFrame(String frameTitle){
 			super(frameTitle);
 			try {
-				BufferedImage icon = ImageIO.read(new File(config.getL4managerDir() +File.separator +"icon" +File.separator +"icon.png"));
+				BufferedImage icon = ImageIO.read(new File(config.getL4managerIconDir() +File.separator +"icon.png"));
 				this.setIconImage(icon);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

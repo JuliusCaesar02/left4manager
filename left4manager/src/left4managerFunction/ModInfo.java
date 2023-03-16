@@ -10,6 +10,7 @@ public class ModInfo{
 	private String description = new String();
 	private List<Tags> tags = new ArrayList<Tags>();
 	private boolean enabled = false; 
+	private short infoSource = 0;
 	
 	
 	/***************
@@ -30,13 +31,14 @@ public class ModInfo{
 	 * @param description
 	 * @param enabled
 	 */
-	public ModInfo(String name, String code, String author, String description, List<Tags> tags, boolean enabled) {
+	public ModInfo(String name, String code, String author, String description, List<Tags> tags, boolean enabled, byte infoSource) {
 		this.name = name;
 		this.code = code;
 		this.author = author;
 		this.description = description;
 		this.tags = tags;
 		this.enabled = enabled;
+		this.infoSource = infoSource;
 	}
 	
 	public void setCode(String code) {
@@ -53,6 +55,16 @@ public class ModInfo{
 	}
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+	/***
+	 * 
+	 * @param infoSource
+	 * 0- None,
+	 * 1- VPK,
+	 * 2- Internet
+	 */
+	public void setInfoSource(short infoSource) {
+		this.infoSource = infoSource;
 	}
 	public void setInfo(String name, String author, String description, List<Tags> tags) {
 		this.name = name;
@@ -75,6 +87,9 @@ public class ModInfo{
 	}
 	public boolean getEnabled() {
 		return this.enabled;
+	}
+	public short getInfoSource() {
+		return this.infoSource;
 	}
 	public Object[] getObject(){
 		return new Object[] {this.name, this.code, this.author, this.enabled};

@@ -33,19 +33,19 @@ public class OptionsTab extends JPanel {
 		
 		JPanel selectFolderPanel = new JPanel();
 		JTextField input = new JTextField();
-		input.setText(config.getL4D2Dir());
+		//input.setText(config.getL4D2Dir());
 		applyButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				File file = new File(input.getText());
 				if (file.getName().equals("Left 4 Dead 2")) {
-					config.writeFile();
+					//config.writeFile();
 
 				} else {
 					JOptionPane.showMessageDialog(input,
 							"The selected folder doesn't seem to be a Left 4 Dead 2 folder", "Invalid folder",
 							JOptionPane.WARNING_MESSAGE);
-					input.setText(config.getL4D2Dir());
+					//input.setText(config.getL4D2Dir());
 				}
 			}
 		});

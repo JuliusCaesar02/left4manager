@@ -58,15 +58,15 @@ public class Utilities {
         return oldJson;
     }
 	
-	public static void fileWriter(File file, String text) throws IOException {
-    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
+	public static void fileWriter(File file, String text, boolean append) throws IOException {
+    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8));
     	bw.write(text);
     	bw.close();
 	}
 	
-	public static void jsonWriter(File file, List<?> object) throws IOException {
+	public static void jsonWriter(File file, List<?> object, boolean append) throws IOException {
     	Gson gson = new GsonBuilder().setPrettyPrinting().create(); 	
-    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
+    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8));
     	gson.toJson(object, bw);
     	bw.close();
 	}
@@ -84,7 +84,7 @@ public class Utilities {
         if(!exist) {    	  	
         	BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
     		oldJson.add(object);
-    		jsonWriter(file, oldJson); 			
+    		jsonWriter(file, oldJson, true); 			
     		fw.close();
         }
 	}
@@ -99,7 +99,7 @@ public class Utilities {
         		return oldJson.get(i); 	
         	}
         }
-		throw new IOException();
+		return null;
 	}
 	
 	public static void createFile(File file) {
@@ -165,6 +165,7 @@ public class Utilities {
 		
 		for (Directory directory : vpkArchive.getDirectories()) {
 			for (ArchiveEntry entry : directory.getEntries()) {
+				System.out.println(entry.getFullName());
 				if(entry.getFullName().equals("addoninfo.txt")) {
 					byte[] bytes = entry.readData();
 					return new String(bytes, StandardCharsets.UTF_8);

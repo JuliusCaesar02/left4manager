@@ -6,28 +6,20 @@ import java.io.FileWriter;
 import java.util.List;
 
 public class UpdateModFile {
-	private String addonsPath = new String();
-	private String fileName = new String();
+	private File addonsPath;
 	
 	/********
 	 * 
 	 * @param config
 	 */
 	public UpdateModFile(Config config) {
-		this.addonsPath = config.getL4D2Dir() +File.separator +"left4dead2" +File.separator;
-		this.fileName = config.getAddonsFileName();
-	}
-	
-	public String getFileName() {
-		return this.fileName;
+		this.addonsPath = config.getL4d2AddonFile();
 	}
 	
 	public void createFile() {
 		try {
-			System.out.println(addonsPath + fileName);
-		    File myObj = new File(addonsPath + fileName);
-		    if (myObj.createNewFile()) {
-		      System.out.println("File created: " + myObj.getName());
+		    if (addonsPath.createNewFile()) {
+		      System.out.println("File created: " + addonsPath.getName());
 		    } else {
 		      System.out.println("File already exists.");
 		    }
@@ -40,7 +32,7 @@ public class UpdateModFile {
 	public void writeFile(String output) {
 		createFile();
 		try {
-			FileWriter myWriter = new FileWriter(addonsPath + fileName);
+			FileWriter myWriter = new FileWriter(addonsPath);
 			myWriter.write(output);
 			myWriter.close();
 			//System.out.println(output);

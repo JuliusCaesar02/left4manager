@@ -14,8 +14,8 @@ public class ModList {
 	private File addonListFile;
 	
 	public ModList(Config config) {
-		this.addonListFile = new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator +"addonlist.txt");
-		this.jsonFile = new File(config.getL4managerDir() +File.separator +"json" +File.separator +"modJson.json");
+		this.addonListFile = config.getL4d2AddonFile();
+		this.jsonFile = new File(config.getL4managerJSONDir() +File.separator +"modJson.json");
 	}
 	
 	public void setJsonFile(File file) {
@@ -132,13 +132,13 @@ public class ModList {
     
     public String[] parseVPKInfo(String text) {
     	String[] result = new String[3];
-    	Pattern titleRegex = Pattern.compile("addontitle\\s*\"([\\S\\s]*?)\\\"", Pattern.CASE_INSENSITIVE);
+    	Pattern titleRegex = Pattern.compile("addontitle\\s+([\\s\\S]*?)\\n\\s*\"*addon", Pattern.CASE_INSENSITIVE);
     	result[0] = Utilities.regexParser(titleRegex, text);
     	
-    	Pattern authorRegex = Pattern.compile("addonauthor\\s*\"([\\S\\s]*?)\\\"", Pattern.CASE_INSENSITIVE);
+    	Pattern authorRegex = Pattern.compile("addonauthor\\s+([\\s\\S]*?)\\n\\s*\"*addon", Pattern.CASE_INSENSITIVE);
     	result[1] = Utilities.regexParser(authorRegex, text);
     	
-    	Pattern descriptionRegex = Pattern.compile("addonDescription\\s*\"([\\S\\s]*?)\\\"", Pattern.CASE_INSENSITIVE);
+    	Pattern descriptionRegex = Pattern.compile("addondescription\\s+\"*([\\s\\S]*?)\"\\n*", Pattern.CASE_INSENSITIVE);
     	result[2] = Utilities.regexParser(descriptionRegex, text);
     	
 		return result;

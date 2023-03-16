@@ -78,12 +78,12 @@ public class GroupTab extends JPanel {
 			super();
 			setLayout(new BorderLayout());
 			groupListModel = new GroupListTableModel(config);
-			try {
+			/*try {
 				groupListModel.add(config.readModGroupFile());
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 			groupListTable = new JTable(groupListModel);
 			groupListTable.setDefaultEditor(String.class, new TextFieldCellEditor());
 			groupListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -250,7 +250,7 @@ public class GroupTab extends JPanel {
 							int rowIndex = modListModel.getIndexByModInfo(rowValue);
 							modListModel.remove(rowIndex);
 						}
-						config.writeModGroupFile(groupListModel.getList());
+						//config.writeModGroupFile(groupListModel.getList());
 					}
 				}
 			});

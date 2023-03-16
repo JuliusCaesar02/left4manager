@@ -150,7 +150,7 @@ public class TableModels {
 		}
 		
 		public void updateModGroupFile() {
-			config.writeModGroupFile(rowData);
+			//config.writeModGroupFile(rowData);
 		}
 	}
 	
