@@ -81,7 +81,7 @@ public class Config {
 		result[0][0] = "l4d2Dir";
 		result[0][1] = Utilities.regexParser(Pattern.compile("\""+result[0][0]+"\":\\s*\"([\\s\\S]*?)\""), text);
 		
-		result[1][0] = "mode";
+		result[1][0] = "offline-mode";
 		result[1][1] = Utilities.regexParser(Pattern.compile("\""+result[1][0]+"\":\\s*\"([\\s\\S]*?)\""), text);
 		
 		File l4d2DirTemp = new File(result[0][1]);

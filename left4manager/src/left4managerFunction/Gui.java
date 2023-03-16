@@ -29,6 +29,10 @@ import com.google.gson.stream.MalformedJsonException;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
+import left4managerFunction.L4Mexceptions.ConfigValueException;
+import left4managerFunction.L4Mexceptions.InfoSourceException;
+import left4managerFunction.L4Mexceptions.ModInfoNotFoundException;
+import left4managerFunction.L4Mexceptions.NoConnectionException;
 import left4managerFunction.TableModels.GroupListTableModel;
 import left4managerFunction.TableModels.GroupModTableModel;
 import java.awt.BorderLayout;
@@ -188,13 +192,15 @@ public class Gui {
 	}
 	
 	private void checkConfigs() {
-		if(config.getConfigs()[1][1] == null || config.getConfigs()[1][1].equals("null")) {
+		try {
+			initialize();
+		} catch (ConfigValueException e) {
+			e.printStackTrace();
 			settingsWindow();
 		}
-		else initialize();
 	}
 
-	private void initialize() {
+	private void initialize() throws ConfigValueException {
 		try {
 			config.writeConfig();
 		} catch (IOException e1) {
@@ -240,7 +246,6 @@ public class Gui {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println(l4d2ModList.size());
 				
 				double totalProgress = 0;
 				int listSize = l4d2ModList.size();
@@ -258,8 +263,8 @@ public class Gui {
 							modList.getModList().add(objectFromJson);	
 							modName = objectFromJson.getName();
 						}
-						else throw new Exception();
-					} catch (Exception e) {
+						else throw new InfoSourceException(objectFromJson.getInfoSource());
+					} catch (InfoSourceException | ModInfoNotFoundException e) {
 						System.out.println("Mod not found in json");
 						File vpkArchive = new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator
 								+"addons" +File.separator +"workshop" +File.separator +singleMod.getCode() +".vpk");
@@ -271,6 +276,8 @@ public class Gui {
 							modList.getModList().add(singleMod);
 							modName = singleMod.getName();
 						}
+					} catch(Exception e) {
+						e.printStackTrace();
 					}
 					
 					totalProgress += progress;
@@ -295,7 +302,7 @@ public class Gui {
 				}
 				frame = new CustomFrame("Left4Manager");
 				frame.setBounds(200, 200, 1080, 720);
-				frame.add(createTabbedPane());
+				frame.add(createMainPanel());
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setVisible(true);
 				loadingFrame.dispose();
@@ -321,27 +328,26 @@ public class Gui {
 				for(int i = 0; i < l4d2ModList.size(); i++) {
 					ModInfo singleMod = l4d2ModList.get(i);
 					try {
-						System.out.println("Mod found in json");
 						ModInfo objectFromJson = Utilities.modInfoFromJson(modList.getJsonFile(), singleMod.getCode());
 						if(objectFromJson.getInfoSource() == 2) {
 							objectFromJson.setEnabled(singleMod.getEnabled());
 							modList.getModList().add(objectFromJson);	
 							modName = objectFromJson.getName();
+							System.out.println("Mod found in json");
 						}
-						else throw new NullPointerException();
-					} catch (NullPointerException | IOException e) {
+						else throw new InfoSourceException(objectFromJson.getInfoSource());
+					} catch (InfoSourceException | ModInfoNotFoundException e) {
 						System.out.println("Mod NOT found in json");
 						try {
 					    	String url = "https://steamcommunity.com/sharedfiles/filedetails/?id=" +singleMod.getCode();
 							String html = Utilities.getHtml(url, "<div class=\"detailBox\"><script type=\"text/javascript\">");
 							String[] additionalInfo =  modList.getAdditionalInfo(html);
-							System.out.println(additionalInfo[0]);
 							List<Tags> tags =  modList.getTags(html);
 							modName = additionalInfo[0];
 							singleMod.setInfo(additionalInfo[0], additionalInfo[1], additionalInfo[2], tags);
 							singleMod.setInfoSource((short) 2);
 							modList.getModList().add(singleMod);		
-						} catch(IOException f) {
+						} catch(NoConnectionException f) {
 							File vpkArchive = new File(config.getL4D2Dir() +File.separator +"left4dead2" +File.separator
 									+"addons" +File.separator +"workshop" +File.separator +singleMod.getCode() +".vpk");
 							String vpkText = Utilities.getVPKInfo(vpkArchive);
@@ -353,6 +359,8 @@ public class Gui {
 								modName = singleMod.getName();
 							}
 						}
+					} catch(Exception e) {
+						e.printStackTrace();
 					}
 					totalProgress += progress;
 					setProgress((int) Math.round(totalProgress));
@@ -363,37 +371,52 @@ public class Gui {
 			}
 		}
 		
-		/*PopulateModListVPK pupulateModList = new PopulateModListVPK();
-		pupulateModList.addPropertyChangeListener(
-				new PropertyChangeListener() {
-					public  void propertyChange(PropertyChangeEvent evt) {
-						if ("progress".equals(evt.getPropertyName())) {
-							loadingBar.setValue((Integer) evt.getNewValue());
+		if(config.getConfigs()[1][1] == null) throw new ConfigValueException(config.getConfigs()[1][0], config.getConfigs()[1][1]);
+		if(config.getConfigs()[1][1].equals("true")) {
+			PopulateModListVPK pupulateModList = new PopulateModListVPK();
+			pupulateModList.addPropertyChangeListener(
+					new PropertyChangeListener() {
+						public  void propertyChange(PropertyChangeEvent evt) {
+							if ("progress".equals(evt.getPropertyName())) {
+								loadingBar.setValue((Integer) evt.getNewValue());
+							}
 						}
-					}
-				});
-		pupulateModList.execute();	*/
-		PopulateModListHTML pupulateModList = new PopulateModListHTML();
-		pupulateModList.addPropertyChangeListener(
-				new PropertyChangeListener() {
-					public  void propertyChange(PropertyChangeEvent evt) {
-						if ("progress".equals(evt.getPropertyName())) {
-							loadingBar.setValue((Integer) evt.getNewValue());
+					});
+			pupulateModList.execute();
+		}
+		else if(config.getConfigs()[1][1].equals("false")) {
+			PopulateModListHTML pupulateModList = new PopulateModListHTML();
+			pupulateModList.addPropertyChangeListener(
+					new PropertyChangeListener() {
+						public  void propertyChange(PropertyChangeEvent evt) {
+							if ("progress".equals(evt.getPropertyName())) {
+								loadingBar.setValue((Integer) evt.getNewValue());
+							}
 						}
-					}
-				});
-		pupulateModList.execute();
+					});
+			pupulateModList.execute();
+		}
+		else throw new ConfigValueException(config.getConfigs()[1][0], config.getConfigs()[1][1]);
 	}
-
-	public JTabbedPane createTabbedPane() {
-		JPanel tab5 = new JPanel();
+	
+	public JPanel createMainPanel() {
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BorderLayout());
+		
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("List", createListTab());
 		tabbedPane.add("Group", groupTab);
 		tabbedPane.add("Order", new SortingTab(modList.getModList()));
 		tabbedPane.add("Tag", createTagTab());
+		JPanel tab5 = new JPanel();
 		tabbedPane.add("Options", tab5);
-		return tabbedPane;
+		mainPanel.add(tabbedPane);
+		
+		JPanel bottomPane = new JPanel();
+		bottomPane.setPreferredSize(new Dimension(10, 20));
+		bottomPane.setBackground(Color.RED);
+		mainPanel.add(bottomPane, BorderLayout.PAGE_END);
+		return mainPanel;
 	}
 
 	public JPanel createListTab() {
@@ -441,7 +464,6 @@ public class Gui {
 		JPanel mainFilterPane = new JPanel();
 		mainFilterPane.setLayout(new BoxLayout(mainFilterPane, BoxLayout.LINE_AXIS));
 		upperPane.setLayout(new BoxLayout(upperPane, BoxLayout.PAGE_AXIS));
-		leftPane.setBackground(Color.green);
 		leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
 		mainFilterPane.add(searchFilterText);
 		mainFilterPane.add(moreFilters);

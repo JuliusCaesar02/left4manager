@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +21,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import left4managerFunction.L4Mexceptions.ModInfoNotFoundException;
+import left4managerFunction.L4Mexceptions.NoConnectionException;
 import com.connorhaigh.javavpk.core.Archive;
 import com.connorhaigh.javavpk.core.ArchiveEntry;
 import com.connorhaigh.javavpk.core.Directory;
@@ -47,13 +49,18 @@ public class Utilities {
 		return output;
 	}
 	
-	public static List<ModInfo> jsonReader(File file) throws IOException {
+	public static List<ModInfo> jsonReader(File file) throws ModInfoNotFoundException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+		
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+		} catch (FileNotFoundException e) {
+			throw new ModInfoNotFoundException(file);
+		}
 
         Type modInfoListType = new TypeToken<List<ModInfo>>(){}.getType();
         List<ModInfo> oldJson = gson.fromJson(br, modInfoListType);
-        br.close();
         
         return oldJson;
     }
@@ -72,7 +79,12 @@ public class Utilities {
 	}
 	
 	public static void jsonAppend(File file, ModInfo object) throws IOException {
-		List<ModInfo> oldJson = jsonReader(file);
+		List<ModInfo> oldJson = new ArrayList<ModInfo>();
+		try {
+			oldJson = jsonReader(file);
+		} catch (ModInfoNotFoundException e) {
+			e.printStackTrace();
+		}
         boolean exist = false;
         
         for(int i = 0; i < oldJson.size(); i++) {
@@ -89,17 +101,22 @@ public class Utilities {
         }
 	}
 	
-	public static ModInfo modInfoFromJson(File file, String code) throws IOException {
+	public static ModInfo modInfoFromJson(File file, String code) throws IOException, ModInfoNotFoundException {
 		List<ModInfo> oldJson = jsonReader(file);
 
 		ModInfo oldModInfo;
-        for(int i = 0; i < oldJson.size(); i++) {
-        	oldModInfo = oldJson.get(i);
-        	if(code.equals(oldModInfo.getCode()) && !oldModInfo.getName().isEmpty()) {
-        		return oldJson.get(i); 	
-        	}
-        }
-		return null;
+		try {
+	        for(int i = 0; i < oldJson.size(); i++) {
+	        	oldModInfo = oldJson.get(i);
+	        	System.out.println(oldModInfo.getName());
+	        	if(code.equals(oldModInfo.getCode()) && !oldModInfo.getName().isEmpty()) {
+	        		return oldJson.get(i); 	
+	        	}
+	        }
+		} catch(NullPointerException e) {
+			throw new ModInfoNotFoundException(code, file);
+		}
+		throw new ModInfoNotFoundException(code, file);
 	}
 	
 	public static void createFile(File file) {
@@ -144,12 +161,18 @@ public class Utilities {
     	else return null;
     }
 	
-	public static String getHtml(String url, String delimiter) throws MalformedURLException, IOException {
+	public static String getHtml(String url, String delimiter) throws NoConnectionException {
 		String html = null;
     	URLConnection connection = null;
-
-		connection =  new URL(url).openConnection();
-		InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
+    	
+    	InputStreamReader reader;
+    	try {
+    		connection =  new URL(url).openConnection();
+    		reader = new InputStreamReader(connection.getInputStream(), "UTF-8");
+    	} catch (IOException e) {
+    		throw new NoConnectionException(url);
+    	}
+    	
 		Scanner scanner = new Scanner(reader);
 		scanner.useDelimiter(delimiter);
 		html = scanner.next();
@@ -165,7 +188,6 @@ public class Utilities {
 		
 		for (Directory directory : vpkArchive.getDirectories()) {
 			for (ArchiveEntry entry : directory.getEntries()) {
-				System.out.println(entry.getFullName());
 				if(entry.getFullName().equals("addoninfo.txt")) {
 					byte[] bytes = entry.readData();
 					return new String(bytes, StandardCharsets.UTF_8);
